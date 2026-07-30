@@ -20,6 +20,56 @@ entity, whereas a **modality** identifies the two different model inputs:
   ChemBERTa embeddings.
 - **Modalities:** the bacterial genome and the tested antibiotic.
 
+## Study workflow
+
+```mermaid
+flowchart TD
+    A[Dataset curation and benchmark construction] --> B[Three-species quantitative MIC benchmark]
+    B --> B1[Escherichia coli]
+    B --> B2[Klebsiella pneumoniae]
+    B --> B3[Salmonella enterica]
+
+    B --> C[Nested leave-one-species-out model selection]
+    C --> G[Genome representation screening]
+    G --> G1[Single-view representations]
+    G --> G2[Input-level feature concatenation]
+    G --> G3[Separate-encoder fusion: projected latent or low-rank bilinear]
+
+    C --> D[Antibiotic representation screening]
+    D --> D1[Single-view molecular representations]
+    D --> D2[Input-level feature concatenation]
+    D --> D3[Separate-encoder fusion: projected latent or low-rank bilinear]
+
+    C --> M[Cross-modal genome–antibiotic architecture screening]
+    M --> M1[Additive effects baseline]
+    M --> M2[Projection–concatenation MLP]
+    M --> M3[Dual-encoder interaction]
+    M --> M4[Gated multimodal unit]
+    M --> M5[Low-rank bilinear interaction]
+    M --> M6[Antibiotic-conditioned FiLM]
+
+    C --> E[Frozen target evaluation cohorts]
+    E --> E1[Pair-level random]
+    E --> E2[Genome-disjoint]
+    E --> E3[Leave-one-antibiotic-out]
+
+    E --> Z[Zero-target-label transfer]
+    Z --> Z1[Single-source]
+    Z --> Z2[Multi-source]
+
+    Z --> L[Limited-label target adaptation: 1%, 5%, 10%]
+    L --> L1[Single-source pretrained]
+    L --> L2[Multi-source pretrained]
+    L --> L3[Same-support target-only from scratch]
+
+    L --> H[Leave-one-antibiotic-out analysis]
+    H --> H1[Target-only all-other-antibiotics reference]
+    H --> H2[Source-MIC-seen antibiotics]
+    H --> H3[Source-MIC-unseen antibiotics]
+
+    H --> R[Manuscript-ready aggregate tables and figures]
+```
+
 ## Data source
 
 The benchmark was derived from the public BV-BRC `genome_amr` collection and
@@ -273,50 +323,83 @@ under `features/drug/`.
 
 ## Installation
 
-Create an isolated Python environment and install the frozen dependencies:
+Clone the repository, create an isolated environment, and install the portable
+pinned dependencies:
 
 ```bash
+git clone https://github.com/Arghyasree/multispecies-mic-transfer.git
+cd multispecies-mic-transfer
 python -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 ```
 
-The frozen environment used PyTorch with CUDA support. Install a PyTorch build
-compatible with the local CUDA driver when the exact wheel recorded in
-`requirements.txt` is unavailable for the target platform.
+`requirements.txt` uses the platform-neutral PyTorch version. The exact GPU
+environment used for the paper, including `torch==2.10.0+cu130`, is preserved in
+`requirements-frozen.txt` and documented in
+[`docs/computational_environment.md`](docs/computational_environment.md).
+Install a PyTorch build compatible with the local CPU/GPU platform when the
+frozen CUDA wheel is unavailable.
 
-Verify the released files before running experiments:
+## Quick verification
+
+Before running training:
 
 ```bash
+python scripts/verify_release.py
 ```
+
+After installing the complete environment, also run the model smoke test:
+
+```bash
+python scripts/verify_release.py --full
+```
+
+Both commands are read-only with respect to the released benchmark and result
+tables.
+
+## Reproducibility scope
+
+The included benchmark index, selected genome and antibiotic matrices, split
+memberships, configurations, run plans, code, and aggregate tables are
+sufficient to validate and rerun the **frozen final evaluation**. Raw BV-BRC
+downloads, assemblies, discarded candidate matrices, checkpoints, and per-run
+training histories are not distributed. Reconstructing the full raw-data and
+model-selection pipeline requires the external resources described in
+[`docs/reproducibility.md`](docs/reproducibility.md).
 
 ## Reproducing the final evaluation
 
-Set the repository root explicitly when required:
+Set the project root and verify the release:
 
 ```bash
 export MIC_TRANSFER_PROJECT="$(pwd)"
+python scripts/verify_release.py --full
 ```
 
-The final evaluation pipeline is:
+Then run the final stages in order:
 
 ```bash
-python scripts/train_zero_target.py
+python scripts/train_zero_target.py --device cuda
 python scripts/aggregate_zero_target.py
-python scripts/adapt_random_pair.py
+python scripts/adapt_random_pair.py --device cuda
 python scripts/aggregate_random_pair.py
-python scripts/adapt_genome_disjoint.py
+python scripts/adapt_genome_disjoint.py --device cuda
 python scripts/aggregate_genome_disjoint.py
-python scripts/adapt_antibiotic_held_out.py
+python scripts/adapt_antibiotic_held_out.py --device cuda
 python scripts/aggregate_antibiotic_held_out.py
 ```
 
-The three selected genome feature matrices used by the frozen final
-configurations are included under `features/genome_representation/`. Raw genome
-assemblies, discarded candidate feature matrices, per-run checkpoints, and
-training histories are not stored in Git. See `data/README.md` and
-`docs/reproducibility.md` for the artifact boundary and reconstruction notes.
+The adaptation stages require the source checkpoints produced by
+`train_zero_target.py`. On a machine without CUDA, use `--device cpu`; full runs
+will be substantially slower. Use `--max-new-runs 1` and the target/seed filters
+shown by `python <script> --help` for a small execution test.
+
+The three selected genome matrices are included under
+`features/genome_representation/`; final molecular matrices are included under
+`features/drug/`. See [`docs/execution_map.md`](docs/execution_map.md) for the
+stage-by-stage inputs and outputs.
 
 ## Results
 
@@ -346,4 +429,7 @@ corresponding manuscript and this repository URL.
 
 ## Public reproducibility pipeline
 
-Publication-relevant benchmark-construction, genome-feature, target-blind model-selection, preregistration, training, adaptation, and aggregation scripts are included under `scripts/`. See [`docs/public_pipeline.md`](docs/public_pipeline.md) for the stage-by-stage mapping and external-software requirements.
+The conceptual workflow above is mapped to the existing repository layout in
+[`docs/execution_map.md`](docs/execution_map.md). The current physical folder
+structure is retained because the frozen scripts and registries use those
+repository-relative paths.

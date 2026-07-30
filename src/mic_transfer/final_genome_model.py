@@ -25,7 +25,7 @@ PROJECT = Path(
 BACKEND_PATH = PROJECT / "src/mic_transfer/model_backend.py"
 
 EXPECTED_BACKEND_SHA256 = (
-    "cc8cd9b4bc9389f2d3e98e4d399a4a98d1d2c36f9af22880f82d1d84c8fc53dc"
+    "13d11f169cb9b03b7566d5bc8775c0a14295c672a620321aa6ac2a41e8c69628"
 )
 
 SCRIPT164_FREEZE = (

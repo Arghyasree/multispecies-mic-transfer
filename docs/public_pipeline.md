@@ -1,51 +1,40 @@
 # Public reproducibility pipeline
 
-This repository contains the publication-relevant stages of the final workflow.
+The public artifact follows this sequence:
 
-## Benchmark construction
+1. dataset curation and benchmark construction;
+2. three-species quantitative MIC benchmark;
+3. target-excluded nested leave-one-species-out model selection;
+4. frozen pair-level random, genome-disjoint, and leave-one-antibiotic-out cohorts;
+5. zero-target-label single-source and multi-source transfer;
+6. 1%, 5%, and 10% limited-label target adaptation;
+7. same-support target-only from-scratch controls;
+8. source-MIC-seen and source-MIC-unseen antibiotic analysis;
+9. manuscript-ready aggregate tables.
 
-Numbered scripts 01–63 cover BV-BRC laboratory-method MIC retrieval and
-profiling, quantitative MIC parsing, scalar monotherapy filtering, repeated
-genome–antibiotic reconciliation, genome metadata and assembly-quality
-screening, molecular-identity eligibility, sequence-based species verification,
-and final taxonomy-verified cohort construction.
+See [`execution_map.md`](execution_map.md) for the exact script-to-stage mapping.
 
-## Genome representations
+## External resources
 
-Scripts 137 and 140–147 cover AMRFinderPlus annotation, target-excluded AMR
-vocabulary construction, common-AMR matrices, and frozen feature-row alignment.
-
-The three selected final genome matrices are distributed directly under
-`features/genome_representation/`. The historical k-mer generator is not
-included because it also contained compatibility-only checks unrelated to the
-final paper.
-
-## Target-blind model selection
-
-Scripts 150–173 preserve the staged selection of k-mer length, genome views,
-antibiotic views, shared numerical hyperparameters, within-entity fusion, and
-cross-modal genome–antibiotic architecture. Outer-target MIC labels were
-excluded from these selections.
-
-## Final transfer definitions
-
-Scripts 174–175 preserve final experiment preregistration and the frozen
-pair-level random, genome-disjoint, and leave-one-antibiotic-out query/support
-definitions.
-
-The cleaned final execution entry points are `train_zero_target.py`,
-`adapt_random_pair.py`, `adapt_genome_disjoint.py`, and
-`adapt_antibiotic_held_out.py`, together with their aggregation scripts.
-
-## External software
-
-Kleborate and AMRFinderPlus must be installed separately. Supply their
-executables through:
+Raw BV-BRC records and assemblies are not redistributed. Kleborate and
+AMRFinderPlus must be installed separately for raw-data reconstruction. Their
+executables can be supplied as:
 
 ```bash
 export KLEBORATE_EXECUTABLE=/path/to/kleborate
 export AMRFINDER_EXECUTABLE=/path/to/amrfinder
 ```
 
-When these variables are unset, the scripts search for `kleborate` and
-`amrfinder` on `PATH`.
+When unset, the relevant scripts search for `kleborate` and `amrfinder` on
+`PATH`.
+
+## Final evaluation entry points
+
+The frozen final evaluation uses:
+
+- `train_zero_target.py` and `aggregate_zero_target.py`;
+- `adapt_random_pair.py` and `aggregate_random_pair.py`;
+- `adapt_genome_disjoint.py` and `aggregate_genome_disjoint.py`;
+- `adapt_antibiotic_held_out.py` and `aggregate_antibiotic_held_out.py`.
+
+Run `python scripts/verify_release.py` before launching expensive experiments.

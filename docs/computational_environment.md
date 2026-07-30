@@ -53,4 +53,4 @@ CUDA device: NVIDIA RTX PRO 5000 Blackwell
 
 ## Frozen Python dependencies
 
-The exact package versions used by the released environment are recorded in `requirements.txt`.
+The exact GPU-specific package versions used by the released environment are recorded in `requirements-frozen.txt`; `requirements.txt` provides the portable pinned installation.

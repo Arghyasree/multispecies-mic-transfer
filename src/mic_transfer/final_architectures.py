@@ -25,7 +25,7 @@ PROJECT = Path(
 SCRIPT165_PATH = PROJECT / "src/mic_transfer/final_genome_model.py"
 
 EXPECTED_SCRIPT165_SHA256 = (
-    "79878378e3aec6c7af84874955c7985c478d238cb976b060cc67e1eec1170f2f"
+    "dfaaa3faf376d4318e3b613f5ca663bc43c8676f2964d0e74913fac327ad3e5c"
 )
 
 SCRIPT172_FREEZE = (
