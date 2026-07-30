@@ -1,111 +1,349 @@
 # Cross-Species Transferability of Multi-View Genome–Antibiotic Models for Quantitative MIC Prediction
 
-This repository contains the code, frozen configurations, split definitions,
-and aggregate results for a three-species quantitative minimum inhibitory
-concentration (MIC) transfer study involving *Escherichia coli*, *Klebsiella
-pneumoniae*, and *Salmonella enterica*.
+This repository contains the frozen benchmark definitions, model configurations,
+source/target run plans, evaluation code, molecular features, and aggregate results
+for a three-species study of quantitative minimum inhibitory concentration (MIC)
+prediction involving *Escherichia coli*, *Klebsiella pneumoniae*, and
+*Salmonella enterica*.
 
-## Study scope
+The study asks whether a genome–antibiotic model trained on one or two bacterial
+species can transfer to a held-out species with no labelled target-species MIC
+observations, and how performance changes after limited-label target adaptation.
 
-Each observation pairs a bacterial genome with an antibiotic and a harmonized
-log2 MIC target. In this repository, **view** denotes an alternative
-representation of the same entity (for example, k-mer and curated AMR genome
-views), whereas **modality** denotes the genome and antibiotic inputs.
+## Terminology
 
-The final study uses nested leave-one-species-out model selection. For each
-outer target species, its MIC outcome labels were excluded from representation,
-architecture, and hyperparameter selection. Candidate configurations were
-compared by bidirectional transfer between the two remaining development
-species on their pairwise shared-antibiotic cohort. The selected configuration
-was then frozen and trained under each prescribed single-source or multi-source
-regime before held-out target evaluation.
+In this repository, a **view** is an alternative representation of the same
+entity, whereas a **modality** identifies the two different model inputs:
 
-## Benchmark
+- **Genome views:** canonical k-mer composition and common AMR determinants.
+- **Antibiotic views:** RDKit descriptors, Morgan fingerprints, and frozen
+  ChemBERTa embeddings.
+- **Modalities:** the bacterial genome and the tested antibiotic.
 
-| Species | Genomes | MIC observations | Antibiotics |
-|---|---:|---:|---:|
-| *E. coli* | 6,673 | 68,881 | 19 |
-| *K. pneumoniae* | 5,602 | 50,299 | 17 |
-| *S. enterica* | 9,119 | 49,183 | 8 |
+## Data source
 
-## Final outer-target configurations
+The benchmark was derived from the public BV-BRC `genome_amr` collection and
+associated BV-BRC genome records and assemblies. The frozen source snapshot was
+retrieved on **22 July 2026** through the BV-BRC REST API using
+`evidence = Laboratory Method`. Only laboratory-reported antimicrobial
+susceptibility measurements linked to the selected bacterial genomes were
+considered.
+
+The original BV-BRC downloads and genome assemblies are not redistributed in
+this repository. The released observation index contains the final benchmark
+identifiers, harmonized quantitative targets, feature-row mappings, and frozen
+split assignments.
+
+## Benchmark construction
+
+The benchmark was produced using the following frozen curation policy.
+
+1. **Genome and record acquisition.** Laboratory-method AMR records were
+   downloaded from BV-BRC, and the corresponding genome metadata and assemblies
+   were obtained for candidate records.
+2. **Assembly and metadata quality control.** Genomes were required to have
+   BV-BRC genome quality `Good`, CheckM completeness at least 95%, CheckM
+   contamination at most 5%, at most 500 contigs, and contig N50 at least
+   20,000 bp. Taxonomic metadata and source-name consistency were also audited.
+3. **Quantitative MIC parsing.** Measurements had to be positive scalar values
+   in mg/L or μg/mL. The accepted signs were blank/`=`, `<`, `<=`, `>`, and `>=`;
+   paired values such as `16/8`, records identified as disk-diffusion zone measurements rather than MIC, and unusable
+   or unverified source-specific values were excluded. Antibiotic names were
+   normalized, and explicit combination-drug identities were excluded from the
+   monotherapy benchmark.
+4. **Source and mapping audit.** Records with unreliable genome mappings or
+   unsupported source/method combinations were removed using frozen,
+   source-specific adjudication rules.
+5. **Repeated-observation reconciliation.** Repeated records for the same
+   species–genome–antibiotic combination were represented as MIC constraints.
+   Compatible records were collapsed through interval intersection; combinations
+   with an empty intersection were excluded. The final benchmark contains at
+   most one quantitative observation per genome–antibiotic pair.
+6. **Censoring-aware point-target policy.** Original censoring status was
+   retained in the released index. Exact and inclusive bounds (`<=`, `>=`) were
+   represented at the reported threshold. Strict `<` values were represented
+   one twofold dilution below the threshold, and strict `>` values one twofold
+   dilution above it. The resulting positive mg/L target was transformed to
+   log₂ MIC.
+7. **Molecular eligibility.** Antibiotic identities were linked to an
+   authoritative single-structure registry before molecular features were
+   generated.
+8. **Sequence-based species verification.** Candidate *E. coli*,
+   *K. pneumoniae*, and *S. enterica* assemblies were checked with the Kleborate
+   Enterobacterales species module. Only strong calls concordant with the target
+   species were retained. This excluded 14 provisional *E. coli* genomes and 70
+   provisional *K. pneumoniae* genomes; no *S. enterica* genome was excluded at
+   this stage.
+
+## Final benchmark
+
+| Species | Genomes | MIC observations | Exact | Censored | Antibiotics |
+|---|---:|---:|---:|---:|---:|
+| *E. coli* | 6,673 | 68,881 | 25,742 | 43,139 | 19 |
+| *K. pneumoniae* | 5,602 | 50,299 | 13,582 | 36,717 | 17 |
+| *S. enterica* | 9,119 | 49,183 | 20,644 | 28,539 | 8 |
+| **Total** | **21,394** | **168,363** | **59,968** | **108,395** | — |
+
+<details>
+<summary><strong>Final antibiotic panels</strong></summary>
+
+**E. coli (19):** amikacin, ampicillin, aztreonam, cefepime, cefmetazole,
+cefotaxime, cefoxitin, ceftazidime, ceftriaxone, cefuroxime, chloramphenicol,
+ciprofloxacin, imipenem, levofloxacin, meropenem, minocycline, tetracycline,
+tigecycline, and tobramycin.
+
+**K. pneumoniae (17):** amikacin, aztreonam, cefepime, cefmetazole,
+cefotaxime, cefoxitin, ceftazidime, ceftriaxone, cefuroxime, ciprofloxacin,
+imipenem, levofloxacin, meropenem, minocycline, tetracycline, tigecycline, and
+tobramycin.
+
+**S. enterica (8):** ampicillin, cefoxitin, ceftazidime, ceftriaxone,
+chloramphenicol, ciprofloxacin, meropenem, and tetracycline.
+
+</details>
+
+## Representations compared
+
+Model selection was staged rather than a simultaneous full-factorial search.
+For every outer target, candidate choices were compared without using MIC labels
+from that target species.
+
+### Genome representations
+
+The genome screen compared:
+
+1. **Canonical k-mer composition only.** Canonical reverse-complement-collapsed
+   relative-frequency vectors were screened for k = 4, 5, 6, 7, and 8. The
+   target-excluded screens selected 4-mer, 5-mer, and 6-mer representations for
+   the outer *E. coli*, *K. pneumoniae*, and *S. enterica* loops,
+   respectively.
+2. **Common AMR view only.** Binary genome-level presence of transferable AMR
+   determinants derived separately for each outer loop using only its two
+   development species. A determinant had to occur in both development species,
+   in at least five genomes per species, and have pooled prevalence no greater
+   than 0.99. Copy multiplicity was ignored.
+3. **Input-level k-mer + AMR concatenation.** Raw k-mer and AMR features were
+   concatenated before one genome encoder.
+4. **Projected latent concatenation.** K-mer and AMR views used separate
+   encoders, followed by concatenation of their projected latent vectors.
+5. **Factorized low-rank bilinear genome-view fusion.** Separate k-mer and AMR
+   encoders were coupled by a low-rank bilinear interaction in addition to the
+   projected latent base.
+
+### Antibiotic representations
+
+The antibiotic screen compared:
+
+1. **RDKit descriptors:** a frozen 27-descriptor physicochemical vector.
+2. **Morgan fingerprint:** radius 2, 2,048 bits, with chirality.
+3. **ChemBERTa mean embedding:** a 384-dimensional frozen embedding obtained by
+   mean-pooling attention-valid non-special tokens.
+4. **ChemBERTa first-token embedding:** a 384-dimensional pooling ablation.
+5. **Two-view input-level concatenation:** ChemBERTa mean + Morgan.
+6. **Three-view input-level concatenation:** ChemBERTa mean + Morgan + RDKit.
+7. **Projected latent multi-view fusion:** separate molecular-view encoders
+   followed by latent concatenation for the two-view and three-view bundles.
+8. **Factorized low-rank bilinear molecular-view fusion:** separate
+   molecular-view encoders with a rank-16 bilinear interaction for the two-view
+   and three-view bundles.
+
+Continuous molecular views were scaled using training-partition statistics;
+the Morgan view remained binary. The ChemBERTa encoder was frozen.
+
+### Genome–antibiotic architectures
+
+With the selected genome and antibiotic representations fixed, the cross-modal
+screen compared:
+
+- a separable additive genome–antibiotic effects baseline;
+- a projection–concatenation multilayer perceptron;
+- a dual-tower interaction network;
+- a cross-modal gated multimodal unit (GMU);
+- a factorized low-rank bilinear interaction model; and
+- drug-to-genome feature-wise linear modulation (FiLM).
+
+## Target-excluded nested leave-one-species-out selection
+
+For each outer target species, all of its MIC outcome labels were excluded from
+representation, architecture, and hyperparameter selection. Candidates were
+ranked by bidirectional transfer between the other two development species using
+all eligible observations from their pairwise shared-antibiotic cohort. The
+selected configuration was then frozen, reinitialized, and trained under each
+prescribed source regime before evaluation on the held-out target.
+
+| Held-out outer target | Development transfer used for selection | Shared antibiotics used only for inner selection | Final transfer regimes |
+|---|---|---:|---|
+| *E. coli* | *K. pneumoniae* ↔ *S. enterica* | 6 | KP→EC, SE→EC, KP+SE→EC |
+| *K. pneumoniae* | *E. coli* ↔ *S. enterica* | 8 | EC→KP, SE→KP, EC+SE→KP |
+| *S. enterica* | *K. pneumoniae* ↔ *E. coli* | 17 | KP→SE, EC→SE, KP+EC→SE |
+
+The pairwise shared cohorts above were used only for target-excluded model
+selection. Final held-out evaluation used each target species' complete eligible
+antibiotic panel.
+
+## Frozen final configurations
 
 | Held-out target | Genome representation | Antibiotic representation | Cross-modal architecture |
 |---|---|---|---|
-| *E. coli* | Separate encoders for selected 4-mer and common AMR views with low-rank bilinear fusion (rank 8) | RDKit descriptors | Drug-conditioned feature-wise linear modulation (FiLM) |
-| *K. pneumoniae* | Single-view common AMR representation | Input-level concatenation of ChemBERTa mean embedding, Morgan fingerprint, and RDKit descriptors | Drug-conditioned FiLM |
-| *S. enterica* | Single-view common AMR representation | ChemBERTa mean embedding | Dual-encoder interaction network |
+| *E. coli* | Separate selected 4-mer and common-AMR encoders with rank-8 factorized low-rank bilinear genome-view fusion | RDKit descriptors | Drug-to-genome FiLM |
+| *K. pneumoniae* | Common-AMR binary view | Input-level concatenation of ChemBERTa mean, Morgan, and RDKit views | Drug-to-genome FiLM |
+| *S. enterica* | Common-AMR binary view | ChemBERTa mean embedding | Dual-tower interaction network |
 
-Numerical settings are read from the frozen shared-hyperparameter registry in
-`config/final/shared_hyperparameters.tsv`; no pilot numerical defaults are used.
+The exact target-excluded numerical settings are stored in
+`config/final/shared_hyperparameters.tsv`; the complete frozen configurations are
+stored in `config/final/outer_target_configurations.tsv`.
 
-## Evaluation
+## Final evaluation
 
-The final held-out target experiments comprise:
+The final study includes:
 
-- zero-target-label cross-species transfer from each single source and from the
-  two-source joint regime;
-- limited-label target adaptation using nested 1%, 5%, and 10% target-support
-  sets for both single-source and multi-source pretrained models;
-- target-only from-scratch baselines using the same target-support observations
-  and query sets;
-- random genome–antibiotic-pair, genome-disjoint, and
-  leave-one-antibiotic-out evaluation;
-- a target-only all-other-antibiotics reference for leave-one-antibiotic-out
-  evaluation;
-- stratification by whether an antibiotic was seen or unseen in source MIC
-  supervision.
+- **zero-target-label transfer:** source-only training with no labelled MIC
+  observation from the held-out target species;
+- **single-source and multi-source limited-label adaptation:** full-model
+  adaptation with nested 1%, 5%, and 10% target-support sets;
+- **same-support target-only from-scratch baseline:** the same frozen
+  outer-target architecture trained from random initialization using exactly the
+  target labels available to the corresponding adapted model;
+- **pair-level random split:** target observations are partitioned into five
+  folds; support and query may contain different antibiotic records from the
+  same genome;
+- **genome-disjoint evaluation:** every observation from a genome group is kept
+  in one of five folds, so query genomes do not occur in target support;
+- **leave-one-antibiotic-out evaluation:** every target observation for one
+  antibiotic is held out, while target support contains only the other
+  antibiotics;
+- **target-only all-other-antibiotics reference:** a target-only model trained on
+  the complete non-query support pool for leave-one-antibiotic-out evaluation;
+- **source MIC-supervision familiarity analysis:** held-out antibiotics are
+  labelled source-seen or source-unseen according to whether they appeared in
+  the source-species MIC training data.
 
-Here, zero-target-label means that no labelled target-species MIC observations
-were used for training or adaptation. It does not imply that an antibiotic
-structure was unavailable to the molecular representation model.
+“Zero-target-label” refers specifically to the absence of labelled target-species
+MIC observations during source training. It does not imply that an antibiotic or
+related chemical structure was absent from external molecular pretraining.
 
-## Primary metrics
+## Metrics and uncertainty
 
-The primary metric is per-antibiotic macro-RMSE on the log2 MIC scale. The
-repository also reports macro-MAE, R2, Pearson correlation, Spearman
-correlation, and within-one-dilution accuracy (1-tier accuracy), defined as the
-proportion of predictions within ±1 log2 dilution of the harmonized evaluation
-target.
+The primary metric is per-antibiotic macro-RMSE on the log₂ MIC scale. The
+repository also reports macro-MAE, R², Pearson correlation, Spearman correlation,
+and within-one-dilution accuracy (1-tier accuracy), defined as the proportion of
+predictions within ±1 log₂ dilution of the harmonized evaluation target.
 
-## Repository layout
+Uncertainty was summarized as follows:
+
+- **Zero-target-label full-panel results:** mean ± sample standard deviation
+  across three model seeds.
+- **Pair-level random and genome-disjoint results:** the three seeds were first
+  averaged within each target fold, followed by mean ± sample standard deviation
+  across the five fold-level values.
+- **Leave-one-antibiotic-out results:** the three seeds were first averaged
+  within each held-out antibiotic, followed by mean ± sample standard deviation
+  across held-out antibiotics.
+
+## Repository contents
 
 ```text
-config/                  Frozen model-selection and final configurations
+config/                  Frozen target-excluded configurations and hyperparameters
 data/                    Data-access and reconstruction notes
-features/drug/           Small final molecular feature matrices
-metadata/                Frozen run plans and release metadata
-results/model_selection/ Aggregate development-selection evidence
+features/drug/           Released molecular feature matrices and row registry
+features/genome_representation/
+                         Three final selected genome feature matrices
+metadata/                Final benchmark index, run plans, query/support memberships, and split registries
+results/model_selection/ Aggregate target-excluded model-selection evidence
 results/evaluation/      Aggregate held-out target results
-scripts/                 Final evaluation and aggregation entry points
-src/mic_transfer/        Reusable model, scaling, and metric code
+scripts/                 Final training, adaptation, and aggregation entry points
+src/mic_transfer/        Reusable model architectures, preprocessing, and metric code
 ```
 
-Large genome assemblies, genome feature matrices, source checkpoints, and
-per-run training outputs are not stored in Git. See `data/README.md` and
-`docs/reproducibility.md` for the expected asset layout and reconstruction
-procedure.
+The observation-level benchmark is released as:
 
-## Figures
+```text
+metadata/final_transfer/nested_loso_v1/splits_v1/
+final_transfer_observation_feature_index_v1.tsv.gz
+```
 
-Figures are intentionally omitted from this release. Final publication figures will be added after manuscript figure selection and caption finalization.
+It contains the species, BV-BRC genome identifier, normalized antibiotic,
+harmonized log₂ MIC target, exact/censored indicator, feature-row mappings,
+duplicate-profile group, and frozen random-pair and genome-disjoint fold
+assignments for all 168,363 final observations.
+
+The nested support and query memberships used in the paper are released in the
+same directory. The final molecular matrices and their row registry are included
+under `features/drug/`.
+
+## Installation
+
+Create an isolated Python environment and install the frozen dependencies:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+```
+
+The frozen environment used PyTorch with CUDA support. Install a PyTorch build
+compatible with the local CUDA driver when the exact wheel recorded in
+`requirements.txt` is unavailable for the target platform.
+
+Verify the released files before running experiments:
+
+```bash
+```
 
 ## Reproducing the final evaluation
 
-1. Create the environment described in `requirements.txt`.
-2. Place the large genome feature matrices at the paths recorded in
-   `config/final/outer_target_configurations.tsv`.
-3. Use the compressed frozen split definitions already stored under
-   `metadata/final_transfer/nested_loso_v1/splits_v1/`; pandas reads the
-   `.tsv.gz` files directly.
-4. Train zero-target-label source checkpoints with
-   `scripts/train_zero_target.py`.
-5. Run the three limited-label evaluation scripts and their aggregation scripts.
-6. Use the aggregate TSV files in `results/model_selection/` and
-   `results/evaluation/` when preparing manuscript tables and figures.
+Set the repository root explicitly when required:
 
-Figures are intentionally not included in this release. They will be added only
-after the manuscript figure set and captions are finalized.
+```bash
+export MIC_TRANSFER_PROJECT="$(pwd)"
+```
 
-The internal filenames retained inside run plans are implementation identifiers;
-the publication terminology used above is authoritative.
+The final evaluation pipeline is:
+
+```bash
+python scripts/train_zero_target.py
+python scripts/aggregate_zero_target.py
+python scripts/adapt_random_pair.py
+python scripts/aggregate_random_pair.py
+python scripts/adapt_genome_disjoint.py
+python scripts/aggregate_genome_disjoint.py
+python scripts/adapt_antibiotic_held_out.py
+python scripts/aggregate_antibiotic_held_out.py
+```
+
+The three selected genome feature matrices used by the frozen final
+configurations are included under `features/genome_representation/`. Raw genome
+assemblies, discarded candidate feature matrices, per-run checkpoints, and
+training histories are not stored in Git. See `data/README.md` and
+`docs/reproducibility.md` for the artifact boundary and reconstruction notes.
+
+## Results
+
+Paper-facing aggregate results are available under `results/evaluation/`.
+Detailed frozen aggregate tables are retained under
+`results/tables/final_transfer/nested_loso_v1/`. Model-selection rankings are
+available under `results/model_selection/`.
+
+Figures are intentionally omitted until the manuscript figure set and captions
+are finalized.
+
+## License
+
+The original software and documentation in this repository are released under
+the MIT License; see `LICENSE`.
+
+The MIT License does not relicense BV-BRC records or genome assemblies, the
+ChemBERTa checkpoint, RDKit, Kleborate, AMRFinderPlus, or any other third-party
+resource. Those materials remain subject to their respective licenses and terms
+of use.
+
+## Citation
+
+A `CITATION.cff` file will be added when the manuscript title, author list,
+venue, and persistent identifier are finalized. Until then, please cite the
+corresponding manuscript and this repository URL.
+
+## Public reproducibility pipeline
+
+Publication-relevant benchmark-construction, genome-feature, target-blind model-selection, preregistration, training, adaptation, and aggregation scripts are included under `scripts/`. See [`docs/public_pipeline.md`](docs/public_pipeline.md) for the stage-by-stage mapping and external-software requirements.

@@ -5,14 +5,25 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "multispecies-mic-transfer"
 version = "0.1.0"
-description = "Cross-species transfer of genome-antibiotic models for quantitative MIC prediction"
+description = "Cross-species transfer of multi-view genome-antibiotic models for quantitative MIC prediction"
+readme = "README.md"
 requires-python = ">=3.10"
+license = {file = "LICENSE"}
+authors = [
+  {name = "Arghyasree Saha"},
+]
 dependencies = [
   "numpy",
   "pandas",
   "scipy",
   "scikit-learn",
   "torch",
+  "rdkit",
+  "transformers",
+  "tokenizers",
+  "safetensors",
+  "PyYAML",
+  "tqdm",
 ]
 
 [tool.setuptools.packages.find]

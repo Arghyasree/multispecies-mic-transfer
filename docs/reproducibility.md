@@ -1,9 +1,10 @@
 # Reproducibility notes
 
 The public repository preserves the frozen final configurations, run plans,
-support/query memberships, aggregate tables, and reusable model code. It does
-not include raw BV-BRC downloads, genome assemblies, large genome feature
-matrices, source checkpoints, or per-run training histories.
+support/query memberships, aggregate tables, and reusable model code. It includes the three selected genome feature matrices used by the final
+frozen configurations. It does not include raw BV-BRC downloads, genome
+assemblies, discarded candidate feature matrices, source checkpoints, or
+per-run training histories.
 
 All paths are repository-relative and may be relocated by setting
 `MIC_TRANSFER_PROJECT` to the repository root. The split files are distributed

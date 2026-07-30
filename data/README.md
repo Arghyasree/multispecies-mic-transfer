@@ -5,10 +5,11 @@ corresponding genome assemblies were downloaded for the selected records. The
 repository does not redistribute those large source files.
 
 The frozen public split definitions identify observations, target species,
-genomes, antibiotics, query memberships, and nested support memberships. To
-rerun training, reconstruct the curated observation table and genome feature
-matrices following the manuscript methods, then preserve the row mappings
-recorded by the released observation index and feature registries.
+genomes, antibiotics, query memberships, and nested support memberships. The
+three genome feature matrices used by the final frozen configurations are
+included under `features/genome_representation/`. Reconstruction from raw
+assemblies still requires the benchmark-curation and genome-feature generation
+procedure described in the manuscript and public pipeline.
 
 The small final molecular feature matrices used by the selected models are
 included under `features/drug/` together with their row registry and the
