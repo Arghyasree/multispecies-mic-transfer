@@ -40,7 +40,7 @@ split assignments.
 |---|---|
 | [BV-BRC](https://www.bv-brc.org/) | Source of quantitative MIC records, genome metadata, and genome assemblies |
 | [BV-BRC documentation](https://www.bv-brc.org/docs/) | Documentation of BV-BRC data types, fields, and provenance |
-| [BV-BRC Data API documentation](https://www.bv-brc.org/docs/system_documentation/data_management_sharing.html) | Programmatic REST access used for data retrieval |
+| [BV-BRC Data API documentation](https://www.bv-brc.org/docs/system_documentation/system_architecture.html#data-api) | Programmatic REST access used for data retrieval |
 | [Kleborate](https://github.com/klebgenomics/Kleborate) and its [documentation](https://kleborate.readthedocs.io/) | Sequence-based species verification |
 | [AMRFinderPlus](https://github.com/ncbi/amr) and its [documentation](https://github.com/ncbi/amr/wiki) | AMR determinant annotation |
 | [PyTorch installation guide](https://pytorch.org/get-started/locally/) | Platform-specific CPU or CUDA installation |
@@ -48,9 +48,11 @@ split assignments.
 | [Hugging Face Transformers documentation](https://huggingface.co/docs/transformers/) | Loading the frozen ChemBERTa molecular encoder |
 
 Python package versions are pinned in
-[`requirements.txt`](requirements.txt) and
-database versions used for the final study should also be reported in the
-manuscript and release metadata.
+[`requirements.txt`](requirements.txt). The final compute environment is
+summarized in
+[`docs/computational_environment.md`](docs/computational_environment.md);
+external executable, model-checkpoint, and database versions should also be
+reported in the manuscript and release metadata.
 
 ## Benchmark construction
 

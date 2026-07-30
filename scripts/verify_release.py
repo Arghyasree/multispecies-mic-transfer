@@ -116,6 +116,9 @@ def verify_documentation(root: Path) -> None:
     reproducibility = require_file(
         root, "docs/reproducibility.md"
     ).read_text(encoding="utf-8")
+    execution_map = require_file(
+        root, "docs/execution_map.md"
+    ).read_text(encoding="utf-8")
 
     forbidden = [
         "Verify the released files before running experiments:",
@@ -136,6 +139,35 @@ def verify_documentation(root: Path) -> None:
     ]:
         if required not in readme:
             raise RuntimeError(f"README is missing: {required}")
+
+    required_execution_map_fragments = [
+        "Exact released script numbers are shown",
+        "Taxonomy-verified modelling precursor",
+        "Nested-LOSO configuration split and feature-index freeze",
+        "Final protocol, three-species paper benchmark, and split freeze",
+        "common-six fields from an earlier preregistration",
+        "`01`, `02`, `03`",
+        "`06`, `07`, `08`",
+        "`13`, `14`, `15`, `16`, `20`, `22`, `25`, `26`",
+        "`150`–`167`, `170`–`173`",
+    ]
+    for fragment in required_execution_map_fragments:
+        if fragment not in execution_map:
+            raise RuntimeError(
+                f"Execution map is missing required mapping text: {fragment}"
+            )
+
+    forbidden_execution_map_fragments = [
+        "`01`–`08`",
+        "`13`–`28`",
+        "`45`–`52`",
+        "final three-species modelling cohort",
+    ]
+    for fragment in forbidden_execution_map_fragments:
+        if fragment in execution_map:
+            raise RuntimeError(
+                f"Execution map contains misleading mapping text: {fragment}"
+            )
 
     private_path = re.compile(r"/home/[^/\s]+|Path\.home\(\).*arghyasree")
     for path in sorted((root / "scripts").glob("*.py")):

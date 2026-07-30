@@ -18,7 +18,7 @@ See [`execution_map.md`](execution_map.md) for the exact script-to-stage mapping
 
 Raw [BV-BRC](https://www.bv-brc.org/) records and assemblies are not redistributed. Consult
 the [BV-BRC documentation](https://www.bv-brc.org/docs/), [Data API documentation]
-(https://www.bv-brc.org/docs/system_documentation/data_management_sharing.html#data-api), and [AMR metadata documentation](https://www.bv-brc.org/docs/quick_references/organisms_taxon/antimicrobial_resistance.html) when
+(https://www.bv-brc.org/docs/system_documentation/system_architecture.html#data-api), and [AMR metadata documentation](https://www.bv-brc.org/docs/quick_references/organisms_taxon/antimicrobial_resistance.html) when
 reconstructing the raw benchmark.
 
 [Kleborate](https://github.com/klebgenomics/Kleborate) and

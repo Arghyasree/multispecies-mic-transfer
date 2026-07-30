@@ -38,6 +38,13 @@ downloads plus separately installed
 [Kleborate](https://github.com/klebgenomics/Kleborate) and
 [AMRFinderPlus](https://github.com/ncbi/amr).
 
+The numbered scripts preserve the released audit trail, but they are not a
+single uninterrupted raw-to-results command chain. Some scripts consume frozen
+historical manifests or candidate feature assets whose generating steps are not
+included in the public release. The supported executable workflow is the frozen
+final evaluation based on the released matrices, configurations, run plans, and
+split definitions.
+
 Because [BV-BRC](https://www.bv-brc.org/) is a live resource, a fresh download may not be byte-identical to
 the 22 July 2026 snapshot. The released observation index, feature matrices,
 splits, configurations, and aggregate tables are therefore the authoritative
