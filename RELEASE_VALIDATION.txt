@@ -1,0 +1,7 @@
+PASS
+Python compilation: PASS
+Removed-pilot scan: PASS
+Removed fixed-panel scan: PASS
+Removed supervised-reference scan: PASS
+Private machine-path scan: PASS
+Figures intentionally excluded: PASS

@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+
+# Environments and editors
+.env
+.venv/
+venv/
+.idea/
+.vscode/
+
+# Large or generated research assets
+*.fasta
+*.fa
+*.fna
+*.fastq
+*.fq
+*.bam
+*.sam
+*.pt
+*.pth
+*.ckpt
+models/
+genomes/
+results/runs/
+results/logs/
+
+# Local scratch and archives
+scratch/
+tmp/
+*.tar.gz
+*.zip
+wget-log*
+install_*.sh

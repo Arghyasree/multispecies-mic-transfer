@@ -1,0 +1,6 @@
+variant	definition
+selected_kmer_only	one selected-kmer encoder producing the common genome latent dimension
+common_AMR_only	one common-AMR encoder producing the same genome latent dimension
+raw_kmer_plus_AMR_single_encoder	raw selected-kmer and AMR features concatenated before one genome encoder
+separate_encoder_projected_kmer_plus_AMR	separate selected-kmer and AMR encoders followed by a projected-concatenation fusion base
+separate_encoder_low_rank_kmer_plus_AMR	Stage B/C only: exactly the same encoders and projected base as the preceding variant plus a low-rank bilinear interaction residual

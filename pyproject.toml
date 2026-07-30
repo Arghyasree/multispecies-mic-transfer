@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "multispecies-mic-transfer"
+version = "0.1.0"
+description = "Cross-species transfer of genome-antibiotic models for quantitative MIC prediction"
+requires-python = ">=3.10"
+dependencies = [
+  "numpy",
+  "pandas",
+  "scipy",
+  "scikit-learn",
+  "torch",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]

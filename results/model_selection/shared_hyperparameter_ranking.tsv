@@ -1,0 +1,10 @@
+outer_target_code	shared_hp_id	seed_count	balanced_bidirectional_macro_rmse_mean	balanced_bidirectional_macro_rmse_sd	latent_width	genome_hidden_multiplier	drug_hidden_multiplier	fusion_hidden_multiplier	dropout	learning_rate	weight_decay	batch_size	maximum_epochs	early_stopping_patience	minimum_rmse_improvement	gradient_clip_norm	selection_rank
+ec	corrective_hp_03_wide_regularised	2	3.9567199647571134	0.05750711481994589	96	2	2	2	0.3	0.0001	0.0001	768	250	25	1e-05	5.0	1
+ec	corrective_hp_02_balanced	2	3.982010381650691	0.04745376059833702	64	2	1	2	0.2	0.0003	1e-05	512	200	20	5e-05	3.0	2
+ec	corrective_hp_01_compact	2	4.199624772288775	0.040802198298815644	32	1	1	1	0.1	0.001	0.0	256	150	15	0.0001	1.0	3
+kp	corrective_hp_03_wide_regularised	2	3.250694846983235	0.006284641947502747	96	2	2	2	0.3	0.0001	0.0001	768	250	25	1e-05	5.0	1
+kp	corrective_hp_02_balanced	2	3.528584735200015	0.20064775627343864	64	2	1	2	0.2	0.0003	1e-05	512	200	20	5e-05	3.0	2
+kp	corrective_hp_01_compact	2	3.7224447972589143	0.11824263660313498	32	1	1	1	0.1	0.001	0.0	256	150	15	0.0001	1.0	3
+se	corrective_hp_02_balanced	2	2.4800301670294993	0.0004316942081296757	64	2	1	2	0.2	0.0003	1e-05	512	200	20	5e-05	3.0	1
+se	corrective_hp_03_wide_regularised	2	2.5902396137824315	0.013350915216313297	96	2	2	2	0.3	0.0001	0.0001	768	250	25	1e-05	5.0	2
+se	corrective_hp_01_compact	2	2.639302141664338	0.10947858890960449	32	1	1	1	0.1	0.001	0.0	256	150	15	0.0001	1.0	3
