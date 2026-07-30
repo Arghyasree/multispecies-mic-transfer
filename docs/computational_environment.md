@@ -51,6 +51,12 @@ CUDA available: True
 CUDA device: NVIDIA RTX PRO 5000 Blackwell
 ```
 
-## Frozen Python dependencies
+## Pinned Python dependencies
 
-The exact GPU-specific package versions used by the released environment are recorded in `requirements-frozen.txt`; `requirements.txt` provides the portable pinned installation.
+The single canonical Python dependency manifest is
+[`requirements.txt`](../requirements.txt). The package versions are pinned for
+the released final evaluation. The exact experiment environment used
+`torch==2.10.0+cu130`, as recorded above; users on another platform should
+install the compatible PyTorch build using the
+[official installation selector](https://pytorch.org/get-started/locally/) while retaining the other
+pins.

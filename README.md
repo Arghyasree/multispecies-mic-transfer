@@ -20,59 +20,9 @@ entity, whereas a **modality** identifies the two different model inputs:
   ChemBERTa embeddings.
 - **Modalities:** the bacterial genome and the tested antibiotic.
 
-## Study workflow
-
-```mermaid
-flowchart TD
-    A[Dataset curation and benchmark construction] --> B[Three-species quantitative MIC benchmark]
-    B --> B1[Escherichia coli]
-    B --> B2[Klebsiella pneumoniae]
-    B --> B3[Salmonella enterica]
-
-    B --> C[Nested leave-one-species-out model selection]
-    C --> G[Genome representation screening]
-    G --> G1[Single-view representations]
-    G --> G2[Input-level feature concatenation]
-    G --> G3[Separate-encoder fusion: projected latent or low-rank bilinear]
-
-    C --> D[Antibiotic representation screening]
-    D --> D1[Single-view molecular representations]
-    D --> D2[Input-level feature concatenation]
-    D --> D3[Separate-encoder fusion: projected latent or low-rank bilinear]
-
-    C --> M[Cross-modal genome–antibiotic architecture screening]
-    M --> M1[Additive effects baseline]
-    M --> M2[Projection–concatenation MLP]
-    M --> M3[Dual-encoder interaction]
-    M --> M4[Gated multimodal unit]
-    M --> M5[Low-rank bilinear interaction]
-    M --> M6[Antibiotic-conditioned FiLM]
-
-    C --> E[Frozen target evaluation cohorts]
-    E --> E1[Pair-level random]
-    E --> E2[Genome-disjoint]
-    E --> E3[Leave-one-antibiotic-out]
-
-    E --> Z[Zero-target-label transfer]
-    Z --> Z1[Single-source]
-    Z --> Z2[Multi-source]
-
-    Z --> L[Limited-label target adaptation: 1%, 5%, 10%]
-    L --> L1[Single-source pretrained]
-    L --> L2[Multi-source pretrained]
-    L --> L3[Same-support target-only from scratch]
-
-    L --> H[Leave-one-antibiotic-out analysis]
-    H --> H1[Target-only all-other-antibiotics reference]
-    H --> H2[Source-MIC-seen antibiotics]
-    H --> H3[Source-MIC-unseen antibiotics]
-
-    H --> R[Manuscript-ready aggregate tables and figures]
-```
-
 ## Data source
 
-The benchmark was derived from the public BV-BRC `genome_amr` collection and
+The benchmark was derived from the public [BV-BRC](https://www.bv-brc.org/) `genome_amr` collection and
 associated BV-BRC genome records and assemblies. The frozen source snapshot was
 retrieved on **22 July 2026** through the BV-BRC REST API using
 `evidence = Laboratory Method`. Only laboratory-reported antimicrobial
@@ -83,6 +33,24 @@ The original BV-BRC downloads and genome assemblies are not redistributed in
 this repository. The released observation index contains the final benchmark
 identifiers, harmonized quantitative targets, feature-row mappings, and frozen
 split assignments.
+
+## External resources and software
+
+| Resource | Role in this study |
+|---|---|
+| [BV-BRC](https://www.bv-brc.org/) | Source of quantitative MIC records, genome metadata, and genome assemblies |
+| [BV-BRC documentation](https://www.bv-brc.org/docs/) | Documentation of BV-BRC data types, fields, and provenance |
+| [BV-BRC Data API documentation](https://www.bv-brc.org/docs/system_documentation/data_management_sharing.html) | Programmatic REST access used for data retrieval |
+| [Kleborate](https://github.com/klebgenomics/Kleborate) and its [documentation](https://kleborate.readthedocs.io/) | Sequence-based species verification |
+| [AMRFinderPlus](https://github.com/ncbi/amr) and its [documentation](https://github.com/ncbi/amr/wiki) | AMR determinant annotation |
+| [PyTorch installation guide](https://pytorch.org/get-started/locally/) | Platform-specific CPU or CUDA installation |
+| [RDKit documentation](https://www.rdkit.org/docs/) | Molecular descriptors and Morgan fingerprints |
+| [Hugging Face Transformers documentation](https://huggingface.co/docs/transformers/) | Loading the frozen ChemBERTa molecular encoder |
+
+Python package versions are pinned in
+[`requirements.txt`](requirements.txt) and
+database versions used for the final study should also be reported in the
+manuscript and release metadata.
 
 ## Benchmark construction
 
@@ -116,7 +84,7 @@ The benchmark was produced using the following frozen curation policy.
    dilution above it. The resulting positive mg/L target was transformed to
    log₂ MIC.
 7. **Molecular eligibility.** Antibiotic identities were linked to an
-   authoritative single-structure registry before molecular features were
+   frozen single-structure registry used in this study before molecular features were
    generated.
 8. **Sequence-based species verification.** Candidate *E. coli*,
    *K. pneumoniae*, and *S. enterica* assemblies were checked with the Kleborate
@@ -323,24 +291,32 @@ under `features/drug/`.
 
 ## Installation
 
-Clone the repository, create an isolated environment, and install the portable
-pinned dependencies:
+Use Python **3.11 or newer**. Clone the repository, create an isolated
+environment, and install the single canonical pinned dependency manifest:
 
 ```bash
 git clone https://github.com/Arghyasree/multispecies-mic-transfer.git
 cd multispecies-mic-transfer
 python -m venv .venv
+
+# Linux/macOS
 source .venv/bin/activate
+
+# Windows PowerShell
+# .\.venv\Scripts\Activate.ps1
+
 python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 ```
 
-`requirements.txt` uses the platform-neutral PyTorch version. The exact GPU
-environment used for the paper, including `torch==2.10.0+cu130`, is preserved in
-`requirements-frozen.txt` and documented in
+[`requirements.txt`](requirements.txt) is the only Python dependency manifest
+used by this release. It pins the portable `torch==2.10.0` package version.
+The final experiments used the CUDA-specific build `torch==2.10.0+cu130`,
+which is recorded in
 [`docs/computational_environment.md`](docs/computational_environment.md).
-Install a PyTorch build compatible with the local CPU/GPU platform when the
-frozen CUDA wheel is unavailable.
+For another CPU or CUDA platform, follow the
+[official PyTorch installation selector](https://pytorch.org/get-started/locally/) while retaining the
+remaining pinned package versions.
 
 ## Quick verification
 
@@ -429,7 +405,7 @@ corresponding manuscript and this repository URL.
 
 ## Public reproducibility pipeline
 
-The conceptual workflow above is mapped to the existing repository layout in
+The study stages are mapped to the existing repository layout in
 [`docs/execution_map.md`](docs/execution_map.md). The current physical folder
 structure is retained because the frozen scripts and registries use those
 repository-relative paths.

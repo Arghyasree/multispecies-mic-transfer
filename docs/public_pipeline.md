@@ -16,9 +16,14 @@ See [`execution_map.md`](execution_map.md) for the exact script-to-stage mapping
 
 ## External resources
 
-Raw BV-BRC records and assemblies are not redistributed. Kleborate and
-AMRFinderPlus must be installed separately for raw-data reconstruction. Their
-executables can be supplied as:
+Raw [BV-BRC](https://www.bv-brc.org/) records and assemblies are not redistributed. Consult
+the [BV-BRC documentation](https://www.bv-brc.org/docs/), [Data API documentation]
+(https://www.bv-brc.org/docs/system_documentation/data_management_sharing.html#data-api), and [AMR metadata documentation](https://www.bv-brc.org/docs/quick_references/organisms_taxon/antimicrobial_resistance.html) when
+reconstructing the raw benchmark.
+
+[Kleborate](https://github.com/klebgenomics/Kleborate) and
+[AMRFinderPlus](https://github.com/ncbi/amr) must be installed separately for raw-data
+reconstruction. Their executables can be supplied as:
 
 ```bash
 export KLEBORATE_EXECUTABLE=/path/to/kleborate
@@ -26,7 +31,9 @@ export AMRFINDER_EXECUTABLE=/path/to/amrfinder
 ```
 
 When unset, the relevant scripts search for `kleborate` and `amrfinder` on
-`PATH`.
+`PATH`. Installation and usage details are available in the
+[Kleborate documentation](https://kleborate.readthedocs.io/) and
+[AMRFinderPlus documentation](https://github.com/ncbi/amr/wiki).
 
 ## Final evaluation entry points
 

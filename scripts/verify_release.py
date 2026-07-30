@@ -130,7 +130,6 @@ def verify_documentation(root: Path) -> None:
         raise RuntimeError("README contains an empty bash code block.")
 
     for required in [
-        "## Study workflow",
         "## Quick verification",
         "## Reproducibility scope",
         "docs/execution_map.md",
@@ -434,18 +433,68 @@ def verify_model_forward_passes(root: Path) -> None:
             )
 
 
+
+def verify_dependency_manifest(root: Path) -> None:
+    obsolete_manifest = root / ("requirements" + "-frozen.txt")
+    if obsolete_manifest.exists():
+        raise RuntimeError(
+            "Obsolete duplicate dependency manifest remains: "
+            f"{obsolete_manifest.name}"
+        )
+
+    manifests = sorted(path.name for path in root.glob("requirements*.txt"))
+    if manifests != ["requirements.txt"]:
+        raise RuntimeError(
+            f"Expected only requirements.txt; found dependency manifests: {manifests}"
+        )
+
+    pyproject = require_file(root, "pyproject.toml").read_text(encoding="utf-8")
+    required_fragments = [
+        'requires-python = ">=3.11"',
+        'dynamic = ["dependencies"]',
+        'dependencies = {file = ["requirements.txt"]}',
+    ]
+    for fragment in required_fragments:
+        if fragment not in pyproject:
+            raise RuntimeError(
+                f"pyproject.toml is missing canonical dependency metadata: {fragment}"
+            )
+
+    public_paths = [
+        root / "README.md",
+        root / "data/README.md",
+        root / "docs/computational_environment.md",
+        root / "docs/public_pipeline.md",
+        root / "docs/reproducibility.md",
+    ]
+    obsolete_name = "requirements" + "-frozen.txt"
+    for document in public_paths:
+        content = require_file(root, str(document.relative_to(root))).read_text(
+            encoding="utf-8"
+        )
+        if obsolete_name in content:
+            raise RuntimeError(
+                f"Obsolete dependency-manifest reference remains in "
+                f"{document.relative_to(root)}"
+            )
+        if "conceptual workflow above" in content:
+            raise RuntimeError(
+                f"Stale workflow wording remains in {document.relative_to(root)}"
+            )
+
 def main() -> None:
     args = parse_args()
     root = args.root.resolve()
     if not (root / ".git").is_dir():
         raise RuntimeError(f"Not a Git repository: {root}")
 
+    verify_dependency_manifest(root)
+
     required_root = [
         "README.md",
         "LICENSE",
         "pyproject.toml",
         "requirements.txt",
-        "requirements-frozen.txt",
         "docs/execution_map.md",
         "docs/public_pipeline.md",
         "docs/reproducibility.md",

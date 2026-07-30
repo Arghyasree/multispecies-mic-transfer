@@ -1,7 +1,6 @@
 # Execution map
 
-The repository separates the **conceptual study workflow** from the physical
-file layout. Numbered scripts preserve the chronological research pipeline;
+The repository maps the **study stages** to the physical file layout. Numbered scripts preserve the chronological research pipeline;
 named scripts provide the final paper-facing execution entry points.
 
 | Stage | Scripts | Main inputs | Main outputs |
@@ -11,7 +10,7 @@ named scripts provide the final paper-facing execution entry points.
 | Molecular eligibility and genome acquisition | `45`–`52` | curated MIC cohort, structure registry | eligible antibiotic panel, genome/assembly manifests |
 | Final taxonomy-verified benchmark | `63` | curated MIC records, species verification | final three-species modelling cohort |
 | AMR feature construction | `137`, `140`, `144`–`147` | assemblies, AMRFinderPlus | target-excluded common-AMR vocabularies and matrices |
-| Target-blind model selection | `150`–`173` | development-species observations and features | ranked candidates and one frozen configuration per target |
+| Target-excluded nested LOSO model selection | `150`–`173` | development-species observations and features | ranked candidates and one frozen configuration per target |
 | Final protocol and split freeze | `174`–`175` | final cohort and frozen configurations | query/support memberships and leakage audits |
 | Zero-target-label transfer | `train_zero_target.py`, `aggregate_zero_target.py` | final matrices, source run plan | source checkpoints, target predictions, aggregate tables |
 | Pair-level random adaptation | `adapt_random_pair.py`, `aggregate_random_pair.py` | source checkpoints, frozen support/query sets | adapted and scratch-baseline results |

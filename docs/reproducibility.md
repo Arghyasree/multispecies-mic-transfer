@@ -29,14 +29,16 @@ pass for each outer-target configuration.
 
 ## 2. Reconstruction from raw public resources — documented but not bundled
 
-Raw BV-BRC downloads, genome assemblies, discarded candidate feature matrices,
-source checkpoints, per-run predictions, and training histories are not stored
-in Git. The numbered scripts document the benchmark-curation, species-checking,
-AMR-feature, model-selection, and split-freezing stages. Reconstructing those
-assets requires fresh BV-BRC downloads plus separately installed Kleborate and
-AMRFinderPlus.
+Raw [BV-BRC](https://www.bv-brc.org/) downloads, genome assemblies, discarded
+candidate feature matrices, source checkpoints, per-run predictions, and
+training histories are not stored in Git. The numbered scripts document the
+benchmark-curation, species-checking, AMR-feature, model-selection, and
+split-freezing stages. Reconstructing those assets requires fresh BV-BRC
+downloads plus separately installed
+[Kleborate](https://github.com/klebgenomics/Kleborate) and
+[AMRFinderPlus](https://github.com/ncbi/amr).
 
-Because BV-BRC is a live resource, a fresh download may not be byte-identical to
+Because [BV-BRC](https://www.bv-brc.org/) is a live resource, a fresh download may not be byte-identical to
 the 22 July 2026 snapshot. The released observation index, feature matrices,
 splits, configurations, and aggregate tables are therefore the authoritative
 paper artifact.

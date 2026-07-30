@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=68", "wheel"]
+requires = ["setuptools>=77.0.3", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -7,24 +7,21 @@ name = "multispecies-mic-transfer"
 version = "0.1.0"
 description = "Cross-species transfer of multi-view genome-antibiotic models for quantitative MIC prediction"
 readme = "README.md"
-requires-python = ">=3.10"
-license = {file = "LICENSE"}
+requires-python = ">=3.11"
+license = "MIT"
+license-files = ["LICENSE"]
 authors = [
   {name = "Arghyasree Saha"},
 ]
-dependencies = [
-  "numpy",
-  "pandas",
-  "scipy",
-  "scikit-learn",
-  "torch",
-  "rdkit",
-  "transformers",
-  "tokenizers",
-  "safetensors",
-  "PyYAML",
-  "tqdm",
-]
+dynamic = ["dependencies"]
+
+[project.urls]
+Repository = "https://github.com/Arghyasree/multispecies-mic-transfer"
+Documentation = "https://github.com/Arghyasree/multispecies-mic-transfer#readme"
+Issues = "https://github.com/Arghyasree/multispecies-mic-transfer/issues"
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
 
 [tool.setuptools.packages.find]
 where = ["src"]
