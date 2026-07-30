@@ -54,44 +54,80 @@ manuscript and release metadata.
 
 ## Benchmark construction
 
-The benchmark was produced using the following frozen curation policy.
+The benchmark was constructed using the following frozen curation procedure.
 
-1. **Genome and record acquisition.** Laboratory-method AMR records were
-   downloaded from BV-BRC, and the corresponding genome metadata and assemblies
-   were obtained for candidate records.
-2. **Assembly and metadata quality control.** Genomes were required to have
-   BV-BRC genome quality `Good`, CheckM completeness at least 95%, CheckM
-   contamination at most 5%, at most 500 contigs, and contig N50 at least
-   20,000 bp. Taxonomic metadata and source-name consistency were also audited.
-3. **Quantitative MIC parsing.** Measurements had to be positive scalar values
-   in mg/L or μg/mL. The accepted signs were blank/`=`, `<`, `<=`, `>`, and `>=`;
-   paired values such as `16/8`, records identified as disk-diffusion zone measurements rather than MIC, and unusable
-   or unverified source-specific values were excluded. Antibiotic names were
-   normalized, and explicit combination-drug identities were excluded from the
-   monotherapy benchmark.
-4. **Source and mapping audit.** Records with unreliable genome mappings or
-   unsupported source/method combinations were removed using frozen,
-   source-specific adjudication rules.
-5. **Repeated-observation reconciliation.** Repeated records for the same
+1. **BV-BRC acquisition and genome quality control.** Records were downloaded
+   from the BV-BRC `genome_amr` collection on 22 July 2026 using
+   `evidence = Laboratory Method`; computationally predicted phenotypes were
+   therefore excluded. Genome metadata and assemblies were obtained for
+   MIC-linked candidate genomes. Genomes were required to have BV-BRC genome
+   quality `Good`, CheckM completeness ≥95%, CheckM contamination ≤5%,
+   ≤500 contigs, and contig N50 ≥20,000 bp. Taxonomic metadata, lineage
+   information, genome-name consistency, and genome mappings were also audited.
+
+2. **Quantitative MIC and source filtering.** MIC values were read from the
+   structured `measurement_value` field and censoring signs from
+   `measurement_sign`. Records were retained only when they contained a
+   positive scalar value, a unit equivalent to mg/L or μg/mL, and one of the
+   supported signs: blank/`=`, `<`, `<=`, `>`, or `>=`. Slash-separated paired
+   concentrations were excluded. Records identified through source and
+   method audits as inhibition-zone diameters rather than MICs, invalid
+   sentinel values, and unresolved source-specific anomalies were also
+   excluded.
+
+3. **Antibiotic normalization and monotherapy filtering.** Raw antibiotic
+   labels and spelling variants were mapped to normalized identities.
+   Thirteen combination-drug identities, including slash-separated
+   combinations and two known space-separated combinations, were excluded
+   because the model requires one defined antibiotic structure per
+   observation. Nine records carrying an invalid non-drug label were also
+   removed. This stage retained 83 normalized monotherapy identities before
+   coverage and molecular filtering.
+
+4. **Source, mapping, and repeated-record reconciliation.** Frozen source-policy
+   and genome-mapping audits were applied before repeated observations were
+   reconciled. Repeated records for the same
    species–genome–antibiotic combination were represented as MIC constraints.
-   Compatible records were collapsed through interval intersection; combinations
-   with an empty intersection were excluded. The final benchmark contains at
-   most one quantitative observation per genome–antibiotic pair.
-6. **Censoring-aware point-target policy.** Original censoring status was
-   retained in the released index. Exact and inclusive bounds (`<=`, `>=`) were
-   represented at the reported threshold. Strict `<` values were represented
-   one twofold dilution below the threshold, and strict `>` values one twofold
-   dilution above it. The resulting positive mg/L target was transformed to
-   log₂ MIC.
-7. **Molecular eligibility.** Antibiotic identities were linked to an
-   frozen single-structure registry used in this study before molecular features were
-   generated.
+   Compatible constraints were reduced through interval intersection, whereas
+   combinations with an empty intersection were excluded as conflicts.
+   From 310,048 filtered source records, this produced 285,797 unique
+   genome–antibiotic observations; 21,348 compatible repeated combinations
+   were collapsed and 817 conflicting combinations were excluded.
+
+5. **Coverage-based antibiotic selection.** Coverage was calculated after
+   repeated-record reconciliation. A species–antibiotic cell was eligible only
+   when it contained at least 500 unique genomes and at least 200 exact (`=`)
+   MIC observations. Antibiotics considered for the cross-species benchmark
+   were additionally required to have an eligible cell in at least two
+   species. This produced 21 coverage-eligible cross-species antibiotic
+   candidates.
+
+6. **Molecular eligibility and final antibiotic panels.** Coverage-eligible
+   antibiotics were subjected to chemical-identity and structure
+   adjudication. Each retained identity required one reproducible, connected
+   single-compound structure with a resolved parent compound, SMILES, InChI,
+   and InChIKey. Gentamicin and colistin were excluded because their database
+   labels could not be represented by one defensible single-compound
+   structure. The remaining 19 antibiotics formed the global benchmark
+   vocabulary. Within each species, only antibiotics whose
+   species–antibiotic cell satisfied the coverage rule were retained, yielding
+   19 antibiotics for *E. coli*, 17 for *K. pneumoniae*, and 8 for
+   *S. enterica*.
+
+7. **Point-target construction with censoring retained.** Original MIC signs
+   and thresholds were preserved in the released observation index. Exact and
+   inclusive measurements (`=`, `<=`, and `>=`) were represented at the
+   reported threshold. Strict `<` measurements were represented one twofold
+   dilution below the threshold, and strict `>` measurements one twofold
+   dilution above it. The resulting positive MIC value in mg/L was transformed
+   to log₂ MIC.
+
 8. **Sequence-based species verification.** Candidate *E. coli*,
-   *K. pneumoniae*, and *S. enterica* assemblies were checked with the Kleborate
-   Enterobacterales species module. Only strong calls concordant with the target
-   species were retained. This excluded 14 provisional *E. coli* genomes and 70
-   provisional *K. pneumoniae* genomes; no *S. enterica* genome was excluded at
-   this stage.
+   *K. pneumoniae*, and *S. enterica* assemblies were evaluated using the
+   Kleborate `enterobacterales__species` module. Only strong sequence-based
+   calls concordant with the intended species were retained. This excluded
+   14 provisional *E. coli* genomes and 70 provisional
+   *K. pneumoniae* genomes; no *S. enterica* genome was excluded.
 
 ## Final benchmark
 
@@ -101,24 +137,6 @@ The benchmark was produced using the following frozen curation policy.
 | *K. pneumoniae* | 5,602 | 50,299 | 13,582 | 36,717 | 17 |
 | *S. enterica* | 9,119 | 49,183 | 20,644 | 28,539 | 8 |
 | **Total** | **21,394** | **168,363** | **59,968** | **108,395** | — |
-
-<details>
-<summary><strong>Final antibiotic panels</strong></summary>
-
-**E. coli (19):** amikacin, ampicillin, aztreonam, cefepime, cefmetazole,
-cefotaxime, cefoxitin, ceftazidime, ceftriaxone, cefuroxime, chloramphenicol,
-ciprofloxacin, imipenem, levofloxacin, meropenem, minocycline, tetracycline,
-tigecycline, and tobramycin.
-
-**K. pneumoniae (17):** amikacin, aztreonam, cefepime, cefmetazole,
-cefotaxime, cefoxitin, ceftazidime, ceftriaxone, cefuroxime, ciprofloxacin,
-imipenem, levofloxacin, meropenem, minocycline, tetracycline, tigecycline, and
-tobramycin.
-
-**S. enterica (8):** ampicillin, cefoxitin, ceftazidime, ceftriaxone,
-chloramphenicol, ciprofloxacin, meropenem, and tetracycline.
-
-</details>
 
 ## Representations compared
 
