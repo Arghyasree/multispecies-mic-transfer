@@ -1,0 +1,18 @@
+item	value
+model_id	DeepChem/ChemBERTa-77M-MLM
+immutable_revision_sha	ed8a5374f2024ec8da53760af91a33fb8f6a15ff
+local_snapshot_path	not_distributed; resolve model_id at immutable_revision_sha
+tokenizer_class	RobertaTokenizer
+masked_language_model_class	RobertaForMaskedLM
+base_model_class	RobertaModel
+hidden_size	384
+vocabulary_size	593
+max_position_embeddings	515
+feature_extraction_device	cpu
+feature_dtype	float32
+encoder_training_state	frozen_eval_mode
+primary_pooling	mean over attention-valid non-special tokens
+secondary_pooling_ablation	first token
+transformers_version	5.3.0
+torch_version	2.10.0+cu130
+huggingface_hub_version	1.7.1

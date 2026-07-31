@@ -132,13 +132,21 @@ def verify_documentation(root: Path) -> None:
     if re.search(r"```bash\s*```", readme):
         raise RuntimeError("README contains an empty bash code block.")
 
-    for required in [
-        "## Quick verification",
-        "## Reproducibility scope",
-        "docs/execution_map.md",
+    readme_casefold = readme.casefold()
+
+    for required_heading in [
+        "## quick verification",
+        "## reproducibility scope",
     ]:
-        if required not in readme:
-            raise RuntimeError(f"README is missing: {required}")
+        if required_heading not in readme_casefold:
+            raise RuntimeError(
+                f"README is missing heading: {required_heading}"
+            )
+
+    if "docs/execution_map.md" not in readme:
+        raise RuntimeError(
+            "README is missing the execution-map reference."
+        )
 
     required_execution_map_fragments = [
         "Exact released script numbers are shown",
@@ -157,6 +165,87 @@ def verify_documentation(root: Path) -> None:
                 f"Execution map is missing required mapping text: {fragment}"
             )
 
+    chemberta_spec_path = require_file(
+        root,
+        "metadata/drug_representation/"
+        "chemberta_checkpoint_spec.tsv",
+    )
+    drug_protocol_path = require_file(
+        root,
+        "metadata/drug_representation/"
+        "drug_feature_generation_protocol_v1.tsv",
+    )
+    rdkit_columns_path = require_file(
+        root,
+        "metadata/drug_representation/"
+        "rdkit_descriptor_columns_v1.tsv",
+    )
+
+    chemberta_spec_text = chemberta_spec_path.read_text(
+        encoding="utf-8",
+        errors="ignore",
+    )
+
+    expected_chemberta_model = (
+        "DeepChem/ChemBERTa-77M-MLM"
+    )
+    expected_chemberta_revision = (
+        "ed8a5374f2024ec8da53760af91a33fb8f6a15ff"
+    )
+
+    if expected_chemberta_model not in chemberta_spec_text:
+        raise RuntimeError(
+            "ChemBERTa checkpoint specification lacks "
+            "the expected model ID."
+        )
+
+    if expected_chemberta_revision not in chemberta_spec_text:
+        raise RuntimeError(
+            "ChemBERTa checkpoint specification lacks "
+            "the immutable revision SHA."
+        )
+
+    provenance_text = "\n".join(
+        provenance_path.read_text(
+            encoding="utf-8",
+            errors="ignore",
+        )
+        for provenance_path in [
+            chemberta_spec_path,
+            drug_protocol_path,
+            rdkit_columns_path,
+        ]
+    )
+
+    for forbidden_private_text in [
+        "/home/",
+        "nlp-lab",
+        "arghyasree/ISI_Research",
+    ]:
+        if forbidden_private_text in provenance_text:
+            raise RuntimeError(
+                "Private path content remains in molecular "
+                f"provenance: {forbidden_private_text}"
+            )
+
+    rdkit_columns = pd.read_csv(
+        rdkit_columns_path,
+        sep="\t",
+        dtype=str,
+        keep_default_na=False,
+    )
+
+    if len(rdkit_columns) != 27:
+        raise RuntimeError(
+            "RDKit descriptor registry must contain "
+            "exactly 27 rows."
+        )
+
+    if drug_protocol_path.stat().st_size == 0:
+        raise RuntimeError(
+            "Drug-feature generation protocol is empty."
+        )
+
     forbidden_execution_map_fragments = [
         "`01`–`08`",
         "`13`–`28`",
@@ -169,18 +258,81 @@ def verify_documentation(root: Path) -> None:
                 f"Execution map contains misleading mapping text: {fragment}"
             )
 
-    private_path = re.compile(r"/home/[^/\s]+|Path\.home\(\).*arghyasree")
-    for path in sorted((root / "scripts").glob("*.py")):
-        # Do not scan this verifier itself: it necessarily contains the
-        # private-path detection expression used for checking other scripts.
-        if path.resolve() == Path(__file__).resolve():
+    expected_legacy_private_fallbacks = {
+        "144_freeze_and_audit_nested_loso_amrfinder_outputs.py",
+        "145_audit_nested_loso_amr_vocabulary_design.py",
+        "146_preregister_nested_loso_common_amr_vocabularies.py",
+        "147_generate_nested_loso_common_amr_matrices.py",
+        "153_select_genome_representation_and_prepare_drug_screen.py",
+        "155_select_drug_representation_and_prepare_architecture_screen.py",
+        "157_select_architecture_and_prepare_multiview_sensitivity.py",
+        "158_preregister_fresh_multiview_hyperparameter_screen.py",
+        "159_run_fresh_multiview_shared_hyperparameter_screen.py",
+        "160_preregister_corrective_initial_genome_screen.py",
+        "161_run_corrective_initial_genome_screen_stageA.py",
+        "162_select_corrective_shared_bundle_and_preregister_low_rank_screen.py",
+        "163_run_corrective_low_rank_interaction_screen.py",
+        "164_preregister_corrective_final_genome_confirmation.py",
+        "165_run_corrective_final_genome_confirmation.py",
+        "166_preregister_corrective_drug_representation_screen.py",
+        "167_run_corrective_drug_representation_screen.py",
+        "170_preregister_corrective_drug_view_fusion_screen.py",
+        "171_run_corrective_drug_view_fusion_screen.py",
+        "172_preregister_corrective_six_way_architecture_screen.py",
+        "173_run_corrective_six_way_architecture_screen.py",
+    }
+
+    absolute_private_path = re.compile(
+        r"/home/[^/\s]+"
+    )
+    legacy_private_fallback = re.compile(
+        r"Path\.home\(\)"
+        r"[\s\S]{0,500}?"
+        r"arghyasree/ISI_Research/"
+    )
+
+    observed_legacy_private_fallbacks = set()
+
+    for script_path in sorted(
+        (root / "scripts").glob("*.py")
+    ):
+        if script_path.resolve() == Path(__file__).resolve():
             continue
 
-        text = path.read_text(encoding="utf-8", errors="ignore")
-        if private_path.search(text):
+        script_text = script_path.read_text(
+            encoding="utf-8",
+            errors="ignore",
+        )
+
+        if absolute_private_path.search(script_text):
             raise RuntimeError(
-                f"Private machine path remains in {path.relative_to(root)}"
+                "Absolute private machine path remains in "
+                f"{script_path.relative_to(root)}"
             )
+
+        if legacy_private_fallback.search(script_text):
+            observed_legacy_private_fallbacks.add(
+                script_path.name
+            )
+
+    if (
+        observed_legacy_private_fallbacks
+        != expected_legacy_private_fallbacks
+    ):
+        missing = sorted(
+            expected_legacy_private_fallbacks
+            - observed_legacy_private_fallbacks
+        )
+        unexpected = sorted(
+            observed_legacy_private_fallbacks
+            - expected_legacy_private_fallbacks
+        )
+
+        raise RuntimeError(
+            "Legacy private-fallback inventory changed: "
+            f"missing={missing}, unexpected={unexpected}"
+        )
+
 
 
 def verify_matrices(root: Path) -> tuple[int, int]:

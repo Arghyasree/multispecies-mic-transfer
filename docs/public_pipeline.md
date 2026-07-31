@@ -8,22 +8,30 @@ The public artifact follows this sequence:
 4. frozen pair-level random, genome-disjoint, and leave-one-antibiotic-out cohorts;
 5. zero-target-label single-source and multi-source transfer;
 6. 1%, 5%, and 10% limited-label target adaptation;
-7. same-support target-only from-scratch controls;
+7. same-support target-only from-scratch baselines;
 8. source-MIC-seen and source-MIC-unseen antibiotic analysis;
 9. manuscript-ready aggregate tables.
 
-See [`execution_map.md`](execution_map.md) for the exact script-to-stage mapping.
+See [`execution_map.md`](execution_map.md) for the exact script-to-stage
+mapping.
 
-## External resources
+## External resources and dependencies
 
-Raw [BV-BRC](https://www.bv-brc.org/) records and assemblies are not redistributed. Consult
-the [BV-BRC documentation](https://www.bv-brc.org/docs/), [Data API documentation]
-(https://www.bv-brc.org/docs/system_documentation/system_architecture.html#data-api), and [AMR metadata documentation](https://www.bv-brc.org/docs/quick_references/organisms_taxon/antimicrobial_resistance.html) when
-reconstructing the raw benchmark.
+Raw [BV-BRC](https://www.bv-brc.org/) records and assemblies are not
+redistributed. Consult the
+[BV-BRC documentation](https://www.bv-brc.org/docs/),
+[Data API documentation](https://www.bv-brc.org/docs/system_documentation/system_architecture.html#data-api),
+and
+[AMR metadata documentation](https://www.bv-brc.org/docs/quick_references/organisms_taxon/antimicrobial_resistance.html)
+when reconstructing the raw benchmark.
+
+Python dependencies used by the released scripts, including `requests` and
+`urllib3` for BV-BRC acquisition, are pinned in
+[`../requirements.txt`](../requirements.txt).
 
 [Kleborate](https://github.com/klebgenomics/Kleborate) and
-[AMRFinderPlus](https://github.com/ncbi/amr) must be installed separately for raw-data
-reconstruction. Their executables can be supplied as:
+[AMRFinderPlus](https://github.com/ncbi/amr) must be installed separately for
+raw-data reconstruction. Their executables can be supplied as:
 
 ```bash
 export KLEBORATE_EXECUTABLE=/path/to/kleborate
@@ -34,6 +42,17 @@ When unset, the relevant scripts search for `kleborate` and `amrfinder` on
 `PATH`. Installation and usage details are available in the
 [Kleborate documentation](https://kleborate.readthedocs.io/) and
 [AMRFinderPlus documentation](https://github.com/ncbi/amr/wiki).
+
+## Molecular-feature provenance
+
+The released molecular matrices are accompanied by:
+
+- [`../metadata/drug_representation/chemberta_checkpoint_spec.tsv`](../metadata/drug_representation/chemberta_checkpoint_spec.tsv),
+  containing the frozen ChemBERTa model and revision specification;
+- [`../metadata/drug_representation/rdkit_descriptor_columns_v1.tsv`](../metadata/drug_representation/rdkit_descriptor_columns_v1.tsv),
+  containing the ordered 27-descriptor RDKit schema;
+- [`../metadata/drug_representation/drug_feature_generation_protocol_v1.tsv`](../metadata/drug_representation/drug_feature_generation_protocol_v1.tsv),
+  containing the frozen molecular-feature generation protocol.
 
 ## Final evaluation entry points
 

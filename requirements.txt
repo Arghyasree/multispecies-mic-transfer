@@ -9,3 +9,5 @@ tokenizers==0.22.2
 safetensors==0.7.0
 PyYAML==6.0.3
 tqdm==4.67.3
+requests==2.34.2
+urllib3==2.7.0

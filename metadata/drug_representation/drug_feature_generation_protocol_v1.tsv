@@ -1,0 +1,21 @@
+section	item	value
+row_order	policy	alphabetical normalized antibiotic order
+row_order	antibiotic_count	19
+identity	specification	19-dimensional one-hot
+morgan	radius	2
+morgan	fingerprint_size	2048
+morgan	include_chirality	True
+morgan	representation	binary uint8 fingerprint
+morgan	stage_a_compatibility	all six shared-drug rows must match bit-for-bit
+rdkit	descriptor_count	27
+rdkit	stored_dtype	float32
+rdkit	generation_scaling	none
+chemberta	model_id	DeepChem/ChemBERTa-77M-MLM
+chemberta	immutable_revision	ed8a5374f2024ec8da53760af91a33fb8f6a15ff
+chemberta	mean_pooling	attention-valid non-special tokens
+chemberta	first_token_pooling	prespecified ablation
+chemberta	stored_dtype	float32
+normalization	model_policy	all learned scaling or projection is fitted only inside training partitions
+software	rdkit_version	2026.3.4
+software	torch_version	2.10.0+cu130
+software	transformers_version	5.3.0
