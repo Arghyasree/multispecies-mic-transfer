@@ -1,10 +1,10 @@
-# Cross-Species Transferability of Multi-View Genome–Antibiotic Models for Quantitative MIC Prediction
+# Cross-Species Transferability of Multi-View Genome–Drug Models for Quantitative MIC Prediction
 
 This repository contains the benchmark, frozen configurations, evaluation splits, code, and aggregate results for cross-species quantitative minimum inhibitory concentration (MIC) prediction in *Escherichia coli* (EC), *Klebsiella pneumoniae* (KP), and *Salmonella enterica* (SE).
 
-The study evaluates whether genome–antibiotic models trained on one or two source species transfer to a held-out target species with zero labelled target MIC observations, and how performance changes after adaptation with 1%, 5%, or 10% labelled target data.
+The study evaluates whether genome–drug models trained on one or two source species transfer to a held-out target species with zero labelled target MIC observations, and how performance changes after adaptation with 1%, 5%, or 10% labelled target data.
 
-K-mer and AMR features are genome views; RDKit, Morgan, and ChemBERTa features are antibiotic views. Genome and antibiotic constitute the two model modalities.
+K-mer and AMR features are genome views; RDKit, Morgan, and ChemBERTa features are drug views. All drugs considered in this study are antibiotics. Genome and drug constitute the two model modalities.
 
 ## Benchmark
 
