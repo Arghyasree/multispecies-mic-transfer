@@ -205,6 +205,23 @@ def verify_documentation(root: Path) -> None:
             "the immutable revision SHA."
         )
 
+    required_chemberta_provenance = [
+        "tokenizer_size_including_added_tokens\t593",
+        "model_config_vocab_size\t600",
+    ]
+    for required_value in required_chemberta_provenance:
+        if required_value not in chemberta_spec_text:
+            raise RuntimeError(
+                "ChemBERTa checkpoint specification is missing: "
+                f"{required_value}"
+            )
+
+    if "vocabulary_size\t" in chemberta_spec_text:
+        raise RuntimeError(
+            "ChemBERTa provenance retains the ambiguous "
+            "vocabulary_size field."
+        )
+
     provenance_text = "\n".join(
         provenance_path.read_text(
             encoding="utf-8",
@@ -630,6 +647,23 @@ def verify_dependency_manifest(root: Path) -> None:
     if manifests != ["requirements.txt"]:
         raise RuntimeError(
             f"Expected only requirements.txt; found dependency manifests: {manifests}"
+        )
+
+    requirements_lines = {
+        line.strip()
+        for line in require_file(
+            root, "requirements.txt"
+        ).read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    }
+
+    required_dependency_pin = (
+        "huggingface-hub==1.7.1"
+    )
+    if required_dependency_pin not in requirements_lines:
+        raise RuntimeError(
+            "requirements.txt is missing the final "
+            f"environment pin: {required_dependency_pin}"
         )
 
     pyproject = require_file(root, "pyproject.toml").read_text(encoding="utf-8")

@@ -6,7 +6,8 @@ tokenizer_class	RobertaTokenizer
 masked_language_model_class	RobertaForMaskedLM
 base_model_class	RobertaModel
 hidden_size	384
-vocabulary_size	593
+tokenizer_size_including_added_tokens	593
+model_config_vocab_size	600
 max_position_embeddings	515
 feature_extraction_device	cpu
 feature_dtype	float32
