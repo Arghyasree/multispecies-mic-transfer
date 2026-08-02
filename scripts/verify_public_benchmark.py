@@ -426,9 +426,9 @@ def verify_public_benchmark(
     )
 
     private_markers = (
-    "/" + "home" + "/",
-    "arghya" + "sree",
-    "ISI" + "_Research",
+        "/" + "home" + "/",
+        "/" + "Users" + "/",
+        "\\" + "Users" + "\\",
     )
 
     for marker in private_markers:

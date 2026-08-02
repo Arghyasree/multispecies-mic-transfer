@@ -141,8 +141,8 @@ The final benchmark index is available at:
 Python 3.11 or newer is required.
 
 ```bash
-git clone https://github.com/Arghyasree/multispecies-mic-transfer.git
-cd multispecies-mic-transfer
+Download and extract the repository archive, then open a terminal in the
+extracted repository root.
 
 python -m venv .venv
 source .venv/bin/activate

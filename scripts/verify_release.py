@@ -703,8 +703,8 @@ def verify_dependency_manifest(root: Path) -> None:
 def main() -> None:
     args = parse_args()
     root = args.root.resolve()
-    if not (root / ".git").is_dir():
-        raise RuntimeError(f"Not a Git repository: {root}")
+    if not (root / "pyproject.toml").is_file():
+        raise RuntimeError(f"Not a release root: {root}")
 
     verify_dependency_manifest(root)
 

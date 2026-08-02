@@ -18,7 +18,6 @@ dynamic = ["dependencies"]
 [project.urls]
 Repository = "https://github.com/Arghyasree/multispecies-mic-transfer"
 Documentation = "https://github.com/Arghyasree/multispecies-mic-transfer#readme"
-Issues = "https://github.com/Arghyasree/multispecies-mic-transfer/issues"
 
 [tool.setuptools.dynamic]
 dependencies = {file = ["requirements.txt"]}
