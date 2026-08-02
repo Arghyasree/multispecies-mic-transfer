@@ -1,6 +1,6 @@
 # Cross-Species Transferability of Multi-View Genome–Drug Models for Quantitative MIC Prediction
 
-This repository contains the benchmark, frozen configurations, evaluation splits, code, and aggregate results for cross-species quantitative minimum inhibitory concentration (MIC) prediction in *Escherichia coli* (EC), *Klebsiella pneumoniae* (KP), and *Salmonella enterica* (SE).
+This repository contains the benchmark, frozen configurations, evaluation splits, code, and aggregate results for cross-species quantitative minimum inhibitory concentration (MIC) prediction in *Escherichia coli* (Ec), *Klebsiella pneumoniae* (Kp), and *Salmonella enterica* (Se).
 
 The study evaluates whether genome–drug models trained on one or two source species transfer to a held-out target species with zero labelled target MIC observations, and how performance changes after adaptation with 1%, 5%, or 10% labelled target data.
 
@@ -8,14 +8,21 @@ K-mer and AMR features are genome views; RDKit, Morgan, and ChemBERTa features a
 
 ## Benchmark
 
-The benchmark was curated from the public [BV-BRC](https://www.bv-brc.org/) `genome_amr` collection and associated genome assemblies retrieved on 22 July 2026.
+The benchmark was curated from the public
+[BV-BRC](https://www.bv-brc.org/) `genome_amr` collection and associated
+genome assemblies retrieved on 22 July 2026.
 
-| Species         |    Genomes | MIC observations |      Exact |    Censored | Antibiotics |
-| --------------- | ---------: | ---------------: | ---------: | ----------: | ----------: |
-| *E. coli*       |      6,673 |           68,881 |     25,742 |      43,139 |          19 |
-| *K. pneumoniae* |      5,602 |           50,299 |     13,582 |      36,717 |          17 |
-| *S. enterica*   |      9,119 |           49,183 |     20,644 |      28,539 |           8 |
-| **Total**       | **21,394** |      **168,363** | **59,968** | **108,395** |           — |
+| Species | Genomes | MIC observations | Exact | Censored | Antibiotics |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| *E. coli* | 6,673 | 68,881 | 25,742 | 43,139 | 19 |
+| *K. pneumoniae* | 5,602 | 50,299 | 13,582 | 36,717 | 17 |
+| *S. enterica* | 9,119 | 49,183 | 20,644 | 28,539 | 8 |
+
+The complete derived benchmark contains 168,363 observations from 21,394
+genomes. It is released as a
+[gzip-compressed TSV](data/benchmark/final_quantitative_mic_benchmark_v1.tsv.gz),
+with definitions of all 62 fields provided in the
+[benchmark schema](docs/benchmark_schema.md).
 
 Main curation criteria:
 
@@ -27,9 +34,13 @@ Main curation criteria:
 * One reproducible, connected molecular structure per antibiotic
 * Sequence-based species verification using [Kleborate](https://github.com/klebgenomics/Kleborate)
 
-MIC values were harmonized to log₂ mg/L while retaining exact and censored measurement metadata. Compatible repeated genome–antibiotic records were reconciled, while conflicting records were excluded.
+MIC values were harmonized to log₂ mg/L while retaining exact and censored
+measurement metadata. Compatible repeated genome–antibiotic records were
+reconciled, while conflicting records were excluded.
 
-The original BV-BRC records and genome assemblies are not redistributed. Detailed curation and reconstruction information is available in [`docs/reproducibility.md`](docs/reproducibility.md).
+The complete raw BV-BRC snapshot and genome assemblies are not redistributed.
+Detailed curation and reconstruction information is available in
+[`docs/reproducibility.md`](docs/reproducibility.md).
 
 ## Target-Excluded Model Selection
 
@@ -37,9 +48,9 @@ One species was held out as the outer target. Representations, architecture, and
 
 | Held-out target | Development transfer | Shared-drug cohort used for selection | Final source regimes   |
 | --------------- | -------------------- | ------------------------------------: | ---------------------- |
-| EC              | KP ↔ SE              |                                     6 | KP→EC, SE→EC, KP+SE→EC |
-| KP              | EC ↔ SE              |                                     8 | EC→KP, SE→KP, EC+SE→KP |
-| SE              | KP ↔ EC              |                                    17 | KP→SE, EC→SE, KP+EC→SE |
+| Ec              | Kp ↔ Se              |                                     6 | Kp→Ec, Se→Ec, Kp+Se→Ec |
+| Kp              | Ec ↔ Se              |                                     8 | Ec→Kp, Se→Kp, Ec+Se→Kp |
+| Se              | Kp ↔ Ec              |                                    17 | Kp→Se, Ec→Se, Kp+Ec→Se |
 
 The shared-drug cohorts were used only for configuration selection. Final evaluation used the complete eligible antibiotic panel of each target species.
 
@@ -55,9 +66,9 @@ The shared-drug cohorts were used only for configuration selection. Final evalua
 
 | Held-out target | Genome representation                                                | Antibiotic representation                                      | Architecture                   |
 | --------------- | -------------------------------------------------------------------- | -------------------------------------------------------------- | ------------------------------ |
-| EC              | 4-mer + common AMR with separate encoders and rank-8 low-rank fusion | RDKit descriptors                                              | Drug-to-genome FiLM            |
-| KP              | Common AMR                                                           | ChemBERTa mean + Morgan + RDKit with input-level concatenation | Drug-to-genome FiLM            |
-| SE              | Common AMR                                                           | ChemBERTa mean                                                 | Dual-tower interaction network |
+| Ec              | 4-mer + common AMR with separate encoders and rank-8 low-rank fusion | RDKit descriptors                                              | Drug-to-genome FiLM            |
+| Kp              | Common AMR                                                           | ChemBERTa mean + Morgan + RDKit with input-level concatenation | Drug-to-genome FiLM            |
+| Se              | Common AMR                                                           | ChemBERTa mean                                                 | Dual-tower interaction network |
 
 Exact settings are provided in:
 
@@ -71,9 +82,9 @@ Each target species was evaluated using two single-source models and one multi-s
 
 | Target | Source regimes         |
 | ------ | ---------------------- |
-| EC     | KP→EC, SE→EC, KP+SE→EC |
-| KP     | EC→KP, SE→KP, EC+SE→KP |
-| SE     | KP→SE, EC→SE, KP+EC→SE |
+| Ec     | Kp→Ec, Se→Ec, Kp+Se→Ec |
+| Kp     | Ec→Kp, Se→Kp, Ec+Se→Kp |
+| Se     | Kp→Se, Ec→Se, Kp+Ec→Se |
 
 The evaluation includes:
 

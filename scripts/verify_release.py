@@ -19,7 +19,7 @@ from typing import Iterable
 
 import numpy as np
 import pandas as pd
-
+from verify_public_benchmark import verify_public_benchmark
 
 EXPECTED_OBSERVATIONS = {
     "ec": 68_881,
@@ -713,6 +713,8 @@ def main() -> None:
         "LICENSE",
         "pyproject.toml",
         "requirements.txt",
+        "data/README.md",
+        "docs/benchmark_schema.md",
         "docs/execution_map.md",
         "docs/public_pipeline.md",
         "docs/reproducibility.md",
@@ -724,6 +726,7 @@ def main() -> None:
     verify_documentation(root)
     genome_rows, drug_rows = verify_matrices(root)
     observations = verify_observations(root, genome_rows, drug_rows)
+    verify_public_benchmark(root, observations)
     verify_splits(root, observations)
     verify_configurations(root)
 
@@ -737,6 +740,7 @@ def main() -> None:
     print(f"Antibiotic feature rows: {drug_rows:,}")
     print("Documentation checks: PASS")
     print("Matrix and row-index checks: PASS")
+    print("Public benchmark table checks: PASS")
     print("Split leakage and nested-support checks: PASS")
     print("Configuration and aggregate-result checks: PASS")
     if args.full:
