@@ -20,9 +20,9 @@ provide the final paper-facing execution entry points.
 | Target-excluded nested-LOSO model selection | `150`–`167`, `170`–`173` | development-species observations and candidate features | ranked representation and architecture candidates and one frozen configuration per target |
 | Final protocol, three-species paper benchmark, and split freeze | `174`, `175` | taxonomy-verified precursor, frozen configurations, and feature-row registries | final *E. coli*/*K. pneumoniae*/*S. enterica* observation index, query sets, nested supports, and leakage audits |
 | Zero-target-label source training and evaluation | `train_zero_target.py`, `aggregate_zero_target.py` | final matrices, frozen configurations, and source run plan | source checkpoints, target predictions, and zero-target-label aggregate tables |
-| Pair-level random adaptation | `adapt_random_pair.py`, `aggregate_random_pair.py` | source checkpoints and frozen random-pair support/query sets | adapted-model and same-support target-only results |
+| Random-pair adaptation | `adapt_random_pair.py`, `aggregate_random_pair.py` | source checkpoints and frozen random-pair support/query sets | adapted-model and target-only scratch results |
 | Genome-disjoint adaptation | `adapt_genome_disjoint.py`, `aggregate_genome_disjoint.py` | source checkpoints and genome-disjoint support/query sets | unseen-genome adaptation and target-only results |
-| Leave-one-antibiotic-out adaptation | `adapt_antibiotic_held_out.py`, `aggregate_antibiotic_held_out.py` | source checkpoints and antibiotic-held-out support/query sets | per-antibiotic, source-seen/source-unseen, adaptation, scratch, and all-other-antibiotics results |
+| Leave-one-antibiotic-out (LOAO) adaptation | `adapt_antibiotic_held_out.py`, `aggregate_antibiotic_held_out.py` | source checkpoints and antibiotic-held-out support/query sets | per-antibiotic, source-shared/source-unseen, adaptation, target-only scratch, and target-only full-support reference results |
 
 ## Reproducibility boundary
 

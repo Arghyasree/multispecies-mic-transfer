@@ -11,7 +11,7 @@ The repository includes:
 - the three selected genome feature matrices;
 - all final molecular feature matrices;
 - target-excluded configurations and numerical hyperparameters;
-- single-source and multi-source run plans;
+- single-source and multisource run plans;
 - final training, adaptation, aggregation, and metric code;
 - aggregate model-selection and held-out evaluation tables.
 

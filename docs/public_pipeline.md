@@ -5,11 +5,11 @@ The public artifact follows this sequence:
 1. dataset curation and benchmark construction;
 2. three-species quantitative MIC benchmark;
 3. target-excluded nested leave-one-species-out model selection;
-4. frozen pair-level random, genome-disjoint, and leave-one-antibiotic-out cohorts;
-5. zero-target-label single-source and multi-source transfer;
+4. frozen random-pair, genome-disjoint, and leave-one-antibiotic-out (LOAO) cohorts;
+5. zero-target-label single-source and multisource transfer;
 6. 1%, 5%, and 10% limited-label target adaptation;
-7. same-support target-only from-scratch baselines;
-8. source-MIC-seen and source-MIC-unseen antibiotic analysis;
+7. target-only scratch baselines using matched support and query sets;
+8. source-shared and source-unseen antibiotic analysis;
 9. manuscript-ready aggregate tables.
 
 See [`execution_map.md`](execution_map.md) for the exact script-to-stage

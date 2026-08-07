@@ -6,6 +6,16 @@ The study evaluates whether genome–drug models trained on one or two source sp
 
 K-mer and AMR features are genome views; RDKit, Morgan, and ChemBERTa features are drug views. All drugs considered in this study are antibiotics. Genome and drug constitute the two model modalities.
 
+
+## Study Workflow
+
+[![Study workflow](results/figures/manuscript/study_workflow.png)](results/figures/manuscript/study_workflow.pdf)
+
+The workflow summarizes benchmark construction, target-excluded nested LOSO
+model selection, single-source and balanced multisource training, and
+evaluation with 0%, 1%, 5%, and 10% target support under random-pair,
+genome-disjoint, and leave-one-antibiotic-out (LOAO) protocols.
+
 ## Benchmark
 
 The benchmark was curated from the public
@@ -78,7 +88,7 @@ Exact settings are provided in:
 
 ## Final Evaluation
 
-Each target species was evaluated using two single-source models and one multi-source model.
+Each target species was evaluated using two single-source models and one balanced multisource model.
 
 | Target | Source regimes         |
 | ------ | ---------------------- |
@@ -90,14 +100,32 @@ The evaluation includes:
 
 * **Zero-target-label transfer:** source-only training without labelled target-species MIC observations
 * **Limited-label target adaptation:** adaptation using nested 1%, 5%, and 10% target-support sets
-* **Pair-level random evaluation:** five folds of genome–antibiotic observations
+* **Random-pair evaluation:** five folds of genome–antibiotic observations
 * **Genome-disjoint evaluation:** five folds in which query genomes are absent from target support
 * **Leave-one-antibiotic-out evaluation:** the query antibiotic is absent from target support
-* **Same-support target-only baseline:** the same architecture trained from random initialization using identical target support
-* **Target-only all-other-antibiotics reference:** trained on all non-query target antibiotics for leave-one-antibiotic-out evaluation
-* **Source-seen/source-unseen analysis:** based on whether an antibiotic appeared in source-species MIC supervision
+* **Target-only scratch baseline:** the same architecture trained from random initialization using identical target support, query sets, and evaluation seeds
+* **Target-only full-support reference (LOAO):** trained from scratch on all non-query target-antibiotic observations
+* **Source-shared/source-unseen antibiotic analysis:** separates target antibiotics according to whether they appeared in source-species MIC supervision
 
 “Zero-target-label” refers specifically to the absence of target-species MIC supervision. Antibiotic molecular structures remain available, and ChemBERTa uses external molecular pretraining.
+
+
+## Key Findings
+
+* Cross-species transfer is strongly direction-dependent; the strongest source
+  species differs across targets.
+* Increasing target support progressively improves random-pair and
+  genome-disjoint performance.
+* Source pretraining provides its largest gains over target-only training from
+  scratch under severe target-label scarcity and in LOAO prediction.
+* Multisource gains are clearest when the additional source expands antibiotic
+  coverage.
+
+[![Balanced multisource adaptation](results/figures/manuscript/multisource_adaptation_by_protocol.png)](results/figures/manuscript/multisource_adaptation_by_protocol.pdf)
+
+The adaptation curves report balanced multisource performance at 0%, 1%, 5%,
+and 10% target support under random-pair, genome-disjoint, and LOAO
+evaluation.
 
 ## Metrics
 
@@ -112,7 +140,7 @@ The primary metric is per-antibiotic macro-RMSE on the log₂ MIC scale. Additio
 | Evaluation                                   | Uncertainty reporting                                                                           |
 | -------------------------------------------- | ----------------------------------------------------------------------------------------------- |
 | Zero-target-label full target panel          | Mean ± sample SD across three model seeds                                                       |
-| Pair-level random and genome-disjoint        | Seeds averaged within each fold, followed by mean ± sample SD across five folds                 |
+| Random-pair and genome-disjoint             | Seeds averaged within each fold, followed by mean ± sample SD across five folds                 |
 | Leave-one-antibiotic-out                     | Seeds averaged within each antibiotic, followed by mean ± sample SD across held-out antibiotics |
 
 Paper-facing results are available in [`results/evaluation/`](results/evaluation/).
@@ -127,6 +155,8 @@ features/genome_representation/
 metadata/                 Benchmark index, run plans, and split registries
 results/model_selection/  Target-excluded selection rankings
 results/evaluation/       Paper-facing aggregate results
+results/figures/manuscript/
+                          Manuscript figures and plotted source data
 scripts/                  Curation, training, adaptation, and aggregation
 src/mic_transfer/         Models, preprocessing, and metrics
 docs/                     Execution and reproducibility documentation
@@ -140,10 +170,10 @@ The final benchmark index is available at:
 
 Python 3.11 or newer is required.
 
-```bash
 Download and extract the repository archive, then open a terminal in the
 extracted repository root.
 
+```bash
 python -m venv .venv
 source .venv/bin/activate
 
