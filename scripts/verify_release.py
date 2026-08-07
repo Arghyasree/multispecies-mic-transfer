@@ -136,7 +136,7 @@ def verify_documentation(root: Path) -> None:
 
     for required_heading in [
         "## quick verification",
-        "## reproducibility scope",
+        "## reproducibility",
     ]:
         if required_heading not in readme_casefold:
             raise RuntimeError(
@@ -149,11 +149,11 @@ def verify_documentation(root: Path) -> None:
         )
 
     required_execution_map_fragments = [
-        "Exact released script numbers are shown",
+        "Study Stages and Scripts",
         "Taxonomy-verified modelling precursor",
-        "Nested-LOSO configuration split and feature-index freeze",
-        "Final protocol, three-species paper benchmark, and split freeze",
-        "common-six fields from an earlier preregistration",
+        "Nested LOSO configuration splits and feature indices",
+        "Final three-species benchmark and evaluation splits",
+        "common-six fields from an earlier preregistration stage",
         "`01`, `02`, `03`",
         "`06`, `07`, `08`",
         "`13`, `14`, `15`, `16`, `20`, `22`, `25`, `26`",

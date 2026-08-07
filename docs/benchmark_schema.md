@@ -1,21 +1,14 @@
 # Public Quantitative MIC Benchmark
 
-## Artifact
+This document explains the released quantitative MIC benchmark and every column in the benchmark table.
 
-The released benchmark table is:
+## Benchmark File
 
-```text
-data/benchmark/final_quantitative_mic_benchmark_v1.tsv.gz
-```
+The benchmark is stored at:
 
-Its checksum is:
+`data/benchmark/final_quantitative_mic_benchmark_v1.tsv.gz`
 
-```text
-data/benchmark/final_quantitative_mic_benchmark_v1.tsv.gz.sha256
-```
-
-The gzip-compressed TSV contains one row per unique
-species–genome–antibiotic observation.
+The compressed TSV contains one row for each unique species–genome–antibiotic observation.
 
 | Species | Genomes | MIC observations | Antibiotics | Exact | Censored |
 | --- | ---: | ---: | ---: | ---: | ---: |
@@ -24,16 +17,13 @@ species–genome–antibiotic observation.
 | *Salmonella enterica* (Se) | 9,119 | 49,183 | 8 | 20,644 | 28,539 |
 | **Total** | **21,394** | **168,363** | **19 unique** | **59,968** | **108,395** |
 
-The benchmark represents 179,385 source records from the BV-BRC snapshot
-retrieved on 22 July 2026. Compatible repeated records were reconciled into
-one observation. The released table contains 11,005 observations derived
-from more than one source record, with at most three source records
-contributing to one observation.
+The benchmark was constructed from **179,385 source records** in the BV-BRC snapshot retrieved on **22 July 2026**.
 
-## Reading the Table
+Compatible repeated records for the same genome–antibiotic pair were reconciled into one observation. The released benchmark contains **11,005 observations** built from more than one source record. At most three source records contribute to a single released observation.
 
-The file follows standard quoted TSV conventions and should be read with a
-TSV-aware parser:
+## Reading the Benchmark
+
+Use a TSV-aware reader. For example:
 
 ```python
 import pandas as pd
@@ -47,108 +37,129 @@ benchmark = pd.read_csv(
 )
 ```
 
-The machine-readable species codes are `ec`, `kp`, and `se`. These lowercase
-codes are retained for compatibility with the released matrices, splits, and
-configurations.
+The machine-readable species codes are:
+
+- `ec` for *Escherichia coli*;
+- `kp` for *Klebsiella pneumoniae*;
+- `se` for *Salmonella enterica*.
+
+These lowercase codes are used throughout the released feature matrices, split definitions, and model configurations.
 
 ## Observation and Target Fields
 
+These columns identify each benchmark observation and its quantitative MIC target.
+
 | Column | Type | Description |
 | --- | --- | --- |
-| `final_transfer_observation_row` | integer | Zero-based row index in the frozen final-transfer table. |
+| `final_transfer_observation_row` | integer | Zero-based row index in the final transfer benchmark. |
 | `species_code` | string | Machine-readable species code: `ec`, `kp`, or `se`. |
 | `provisional_species` | string | Harmonized species assignment used during benchmark construction. |
 | `observation_id` | string | Stable identifier for the reconciled quantitative MIC observation. |
 | `genome_id` | string | BV-BRC genome identifier. |
-| `normalized_antibiotic` | string | Harmonized antibiotic identity used throughout the study. |
-| `mic_target_log2_mg_per_l` | float | Regression target: the base-2 logarithm of the point MIC in mg/L. |
-| `is_exact_observation` | Boolean | Indicates that the reconciled MIC observation is exact. |
-| `is_censored_observation` | Boolean | Indicates that the observation is left- or right-censored. |
+| `normalized_antibiotic` | string | Harmonized antibiotic name used throughout the study. |
+| `mic_target_log2_mg_per_l` | float | Regression target: base-2 logarithm of the point MIC in mg/L. |
+| `is_exact_observation` | Boolean | `True` when the reconciled MIC observation is exact. |
+| `is_censored_observation` | Boolean | `True` when the observation is left- or right-censored. |
 
-Every row is exactly one of exact or censored. No
-species–genome–antibiotic key occurs more than once.
+Every observation is either exact or censored, but never both.
 
-## Reconciled MIC-Constraint Fields
+Each species–genome–antibiotic combination appears only once in the released benchmark.
+
+## Reconciled MIC Constraint Fields
+
+These columns describe how the original MIC measurement, or compatible repeated measurements, were converted into the final quantitative observation.
 
 | Column | Type | Description |
 | --- | --- | --- |
-| `reconciliation_status` | string | Outcome of single-record handling or repeated-record reconciliation. |
+| `reconciliation_status` | string | Result of handling a single record or reconciling repeated records. |
 | `constraint_origin` | string | Provenance category of the final MIC constraint. |
-| `duplicate_class` | string | Classification of the source-record multiplicity or duplication pattern. |
-| `reduced_constraint_type` | string | Final constraint type after reconciliation. |
+| `duplicate_class` | string | Class describing the source-record multiplicity or duplication pattern. |
+| `reduced_constraint_type` | string | Final MIC constraint type after reconciliation. |
 | `reduced_sign` | string | Final relation sign: `=`, `<`, `<=`, `>`, or `>=`. |
-| `reduced_mic_value` | float | Reported threshold associated with the final relation sign. |
-| `intersection_lower` | optional float | Lower endpoint of the reconciled interval; blank when unbounded. |
-| `intersection_lower_closed` | optional Boolean | Indicates whether the lower endpoint is inclusive. |
-| `intersection_upper` | optional float | Upper endpoint of the reconciled interval; blank when unbounded. |
-| `intersection_upper_closed` | optional Boolean | Indicates whether the upper endpoint is inclusive. |
-| `intersection_notation` | string | Human-readable representation of the reconciled interval. |
-| `mic_target_point_mg_per_l` | float | Positive point MIC used for regression, expressed in mg/L. |
-| `mic_target_substitution_rule` | string | Rule used to derive the point target from the reconciled constraint. |
+| `reduced_mic_value` | float | MIC threshold associated with the final relation sign. |
+| `intersection_lower` | optional float | Lower endpoint of the reconciled MIC interval. Blank when there is no lower bound. |
+| `intersection_lower_closed` | optional Boolean | Indicates whether the lower interval endpoint is inclusive. |
+| `intersection_upper` | optional float | Upper endpoint of the reconciled MIC interval. Blank when there is no upper bound. |
+| `intersection_upper_closed` | optional Boolean | Indicates whether the upper interval endpoint is inclusive. |
+| `intersection_notation` | string | Human-readable form of the reconciled MIC interval. |
+| `mic_target_point_mg_per_l` | float | Positive point MIC used as the regression target, in mg/L. |
+| `mic_target_substitution_rule` | string | Rule used to convert the reconciled constraint into a point MIC target. |
 | `censoring_direction` | string | Censoring direction: none, left, or right. |
-| `censoring_strictness` | string | Whether the censoring relation is strict or inclusive. |
-| `point_target_version` | string | Version identifier for the point-target construction policy. |
-| `normalized_unit` | string | Common MIC unit; all released values use `mg/L`. |
+| `censoring_strictness` | string | Indicates whether the censoring relation is strict or inclusive. |
+| `point_target_version` | string | Version identifier for the point-target construction rule. |
+| `normalized_unit` | string | Common MIC unit. All released MIC values use `mg/L`. |
 
-Exact measurements and inclusive bounds retain the reported threshold. A
-strict left-censored value `<c` is represented by `c/2`, and a strict
-right-censored value `>c` is represented by `2c`. The original sign and
-interval remain available for censor-aware analyses.
+### Point Targets for Censored MIC Values
+
+Exact measurements and inclusive bounds keep the reported threshold.
+
+For strict censored measurements:
+
+- `<c` is represented by `c/2`;
+- `>c` is represented by `2c`.
+
+The original relation sign and reconciled interval remain in the benchmark, so the censoring information is retained.
 
 ## Source-Record Provenance Fields
 
+These columns preserve information about the original BV-BRC records that contributed to each released observation.
+
 | Column | Type | Description |
 | --- | --- | --- |
-| `source_record_count` | integer | Number of original BV-BRC records contributing to the observation. |
+| `source_record_count` | integer | Number of original BV-BRC records contributing to the released observation. |
 | `source_record_ids` | string | Pipe-delimited BV-BRC record identifiers in source-record order. |
-| `source_genome_names` | string | Genome-name provenance retained from the contributing records. |
-| `source_taxon_ids` | string | Taxon-identifier provenance retained from the contributing records. |
+| `source_genome_names` | string | Genome names reported by the contributing source records. |
+| `source_taxon_ids` | string | Taxon identifiers reported by the contributing source records. |
 | `source_antibiotic_labels` | string | Original antibiotic labels before name harmonization. |
 | `source_measurements` | string | Original MIC measurement strings. |
-| `source_measurement_signs` | string | Original relation-sign provenance. |
-| `source_measurement_values` | string | Original numeric measurement-value provenance. |
+| `source_measurement_signs` | string | Original MIC relation signs. |
+| `source_measurement_values` | string | Original numeric MIC values. |
 | `source_normalized_signs` | string | Relation signs after quantitative parsing and normalization. |
-| `source_mic_values` | string | Parsed MIC-value provenance on the common quantitative scale. |
-| `source_methods` | string | Laboratory-method provenance. |
-| `source_method_versions` | string | Laboratory-method version provenance. |
-| `source_platforms` | string | Laboratory-platform provenance. |
-| `source_vendors` | string | Testing-vendor provenance. |
-| `source_testing_standards` | string | Susceptibility-testing-standard provenance. |
-| `source_testing_standard_years` | string | Testing-standard year provenance. |
+| `source_mic_values` | string | Parsed MIC values on the common quantitative scale. |
+| `source_methods` | string | Laboratory methods reported by the contributing records. |
+| `source_method_versions` | string | Laboratory-method versions reported by the contributing records. |
+| `source_platforms` | string | Laboratory platforms reported by the contributing records. |
+| `source_vendors` | string | Testing vendors reported by the contributing records. |
+| `source_testing_standards` | string | Susceptibility-testing standards reported by the contributing records. |
+| `source_testing_standard_years` | string | Years associated with the reported testing standards. |
 | `source_pmids` | string | Publication identifiers reported by BV-BRC. |
-| `source_insertion_dates` | string | BV-BRC insertion-date provenance. |
-| `source_context_count` | integer | Number of retained source contexts for the observation. |
-| `source_contexts` | string | Serialized source-context provenance retained during reconciliation. |
-| `source_measurement_units` | string | Original measurement units, positionally aligned with `source_record_ids`. |
+| `source_insertion_dates` | string | BV-BRC insertion dates for the contributing records. |
+| `source_context_count` | integer | Number of retained source contexts for the released observation. |
+| `source_contexts` | string | Serialized source-context information retained during reconciliation. |
+| `source_measurement_units` | string | Original MIC units, positionally aligned with `source_record_ids`. |
 | `source_resistant_phenotypes` | string | Resistant-phenotype values, positionally aligned with `source_record_ids`. |
 | `source_modification_dates` | string | BV-BRC modification dates, positionally aligned with `source_record_ids`. |
 | `source_evidence` | string | BV-BRC evidence values, positionally aligned with `source_record_ids`. |
 
-For the four positionally aligned fields, pipe-delimited element `j`
-corresponds to source-record identifier `j` in `source_record_ids`. Empty
-tokens are retained when an individual source record lacks a value. Every
-released source record has `Laboratory Method` evidence.
+For the positionally aligned fields, item `j` corresponds to item `j` in `source_record_ids`.
 
-The complete raw BV-BRC snapshot and genome assemblies are not copied into
-this repository. The benchmark is a derived, reconciled table containing the
-provenance required to identify its contributing source records.
+Empty pipe-delimited entries are kept when an individual source record does not contain a value.
+
+Every released source record has `Laboratory Method` evidence.
+
+The complete raw BV-BRC snapshot and genome assemblies are not copied into this repository. The released benchmark is a derived and reconciled table that keeps the provenance needed to identify its contributing BV-BRC source records.
 
 ## Feature-Alignment Fields
 
+These columns connect benchmark observations to the genome and antibiotic representations used by the models.
+
 | Column | Type | Description |
 | --- | --- | --- |
-| `genome_feature_row` | integer | Row index linking the observation to the genome registry and released genome matrices. |
-| `drug_feature_row` | integer | Row index linking the observation to the frozen antibiotic registry. |
+| `genome_feature_row` | integer | Row index linking the observation to the genome registry and genome feature matrices. |
+| `drug_feature_row` | integer | Row index linking the observation to the antibiotic registry. |
 | `identity_feature_row` | integer | Row index for the antibiotic-identity control representation. |
 | `morgan_feature_row` | integer | Row index in the Morgan fingerprint matrix. |
 | `rdkit_feature_row` | integer | Row index in the RDKit descriptor matrix. |
-| `chemberta_mean_feature_row` | integer | Row index in the mean-pooled ChemBERTa matrix. |
-| `chemberta_first_feature_row` | integer | Row index in the ChemBERTa first-token ablation matrix. |
+| `chemberta_mean_feature_row` | integer | Row index in the mean-pooled ChemBERTa representation. |
+| `chemberta_first_feature_row` | integer | Row index in the ChemBERTa first-token ablation representation. |
 
-The feature-row indices are zero-based. Repeated observations for the same
-genome or antibiotic point to the same corresponding feature row.
+All feature-row indices are zero-based.
+
+Observations for the same genome point to the same genome feature row. Observations for the same antibiotic point to the same corresponding antibiotic feature row.
 
 ## Group and Fold Fields
+
+These columns support the random-pair and genome-disjoint evaluation protocols.
 
 | Column | Type | Description |
 | --- | --- | --- |
@@ -158,11 +169,25 @@ genome or antibiotic point to the same corresponding feature row.
 | `random_pair_fold` | integer | Deterministic random-pair query-fold assignment. |
 | `genome_disjoint_fold` | integer | Deterministic genome-group-disjoint query-fold assignment. |
 
-Complete query and nested-support memberships are released under:
+Complete query memberships and nested 1%, 5%, and 10% target-support memberships are stored under:
 
-```text
-metadata/final_transfer/nested_loso_v1/splits_v1/
-```
+`metadata/final_transfer/nested_loso_v1/splits_v1/`
 
-The drug-held-out protocol is defined through its leave-one-antibiotic-out
-query and support membership files rather than a single column in this table.
+For **leave-one-antibiotic-out (LOAO) evaluation**, query and support sets are defined by separate membership files rather than by a single column in the benchmark table.
+
+## How the Benchmark Connects to the Evaluation
+
+The benchmark table provides the common observation index used by the released evaluation protocols.
+
+- **Random-pair evaluation** uses `random_pair_fold`.
+- **Genome-disjoint evaluation** uses `genome_disjoint_fold` together with the genome-group definitions.
+- **Leave-one-antibiotic-out (LOAO) evaluation** uses the released LOAO query and support membership files.
+- **Limited-label transfer** uses the released nested 1%, 5%, and 10% target-support memberships.
+
+Target-query labels are used only for final evaluation.
+
+For a broader description of the evaluation workflow, see:
+
+- `docs/public_pipeline.md`
+- `docs/reproducibility.md`
+- `README.md`
