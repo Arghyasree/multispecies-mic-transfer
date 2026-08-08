@@ -236,7 +236,7 @@ python scripts/adapt_genome_disjoint.py --device cuda
 python scripts/aggregate_genome_disjoint.py
 ```
 
-### Leave-One-Antibiotic-Out Adaptation
+### LOAO Adaptation
 
 ```bash
 python scripts/adapt_antibiotic_held_out.py --device cuda
