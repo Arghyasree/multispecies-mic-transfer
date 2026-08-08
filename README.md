@@ -23,14 +23,12 @@ All drugs considered in this study are antibiotics.
 
 [![Study workflow](results/figures/manuscript/study_workflow.png)](results/figures/manuscript/study_workflow.pdf)
 
-[![Study workflow](results/figures/manuscript/study_workflow.png)](results/figures/manuscript/study_workflow.pdf)
-
 The study has four main stages:
 
 1. construct a curated quantitative MIC benchmark;
 2. perform **target-excluded nested leave-one-species-out (LOSO) model selection**;
 3. train two **single-source** models and one **balanced multisource** model for each target species;
-4. evaluate zero-target-label transfer and limited-label adaptation under random-pair, genome-disjoint, and leave-one-antibiotic-out protocols.
+4. evaluate zero-target-label transfer and limited-label adaptation under random-pair, genome-disjoint, and leave-one-antibiotic-out (LOAO) protocols.
 
 The 1%, 5%, and 10% target-support sets are nested. Target-query labels are used only for final evaluation.
 
@@ -40,9 +38,9 @@ The benchmark was constructed from the public [BV-BRC](https://www.bv-brc.org/) 
 
 | Species | Genomes | MIC observations | Exact | Censored | Antibiotics |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| *E. coli* | 6,673 | 68,881 | 25,742 | 43,139 | 19 |
-| *K. pneumoniae* | 5,602 | 50,299 | 13,582 | 36,717 | 17 |
-| *S. enterica* | 9,119 | 49,183 | 20,644 | 28,539 | 8 |
+| *Ec* | 6,673 | 68,881 | 25,742 | 43,139 | 19 |
+| *Kp* | 5,602 | 50,299 | 13,582 | 36,717 | 17 |
+| *Se* | 9,119 | 49,183 | 20,644 | 28,539 | 8 |
 | **Total** | **21,394** | **168,363** | **59,968** | **108,395** | **19 unique** |
 
 The benchmark contains **168,363 unique genome–antibiotic observations** from **21,394 quality-controlled and sequence-verified genomes** across a **19-antibiotic cross-species vocabulary**.
@@ -71,7 +69,7 @@ The benchmark retains:
 
 MIC values were harmonized to log₂ mg/L while retaining the original exact or censored measurement information.
 
-Compatible repeated measurements for the same genome–antibiotic pair were reconciled into one observation. Conflicting repeated measurements were excluded.
+After resolving repeated measurements, each genome–antibiotic pair is represented by one observation. Conflicting repeated measurements were excluded.
 
 The complete raw BV-BRC snapshot and genome assemblies are not redistributed. See [`docs/reproducibility.md`](docs/reproducibility.md) for details.
 
@@ -135,8 +133,6 @@ The resulting checkpoint is reused across target protocols and support settings.
 
 In **zero-target-label transfer**, the model is trained only on source-species observations and evaluated on the target species without using target MIC labels.
 
-This corresponds to the **zero-shot transfer** setting used in the manuscript.
-
 ## Limited-Label Transfer
 
 **Limited-label transfer** starts from the same source-trained model and adapts it using nested:
@@ -145,11 +141,11 @@ This corresponds to the **zero-shot transfer** setting used in the manuscript.
 - 5% target support;
 - 10% target support.
 
-For each query, non-query observations are arranged in one deterministic antibiotic-balanced order. The 1%, 5%, and 10% target-support sets are nested prefixes of this ordering.
+For each query, non-query observations are arranged deterministically interleaved across support antibiotics.
 
 For each support antibiotic with at least two observations, a deterministic 20% subset is used for inner validation while keeping at least one observation for training.
 
-Per-antibiotic macro-RMSE on this inner set selects up to 100 adaptation epochs with patience 12. The source checkpoint is then reloaded and adapted on the complete support set for the selected number of epochs.
+Per-antibiotic macro-RMSE is used to select the adaptation duration, with up to 100 epochs and patience 12. The source checkpoint is then reloaded and adapted on the complete support set for the selected duration.
 
 Target-query labels are never used for adaptation-epoch selection.
 
@@ -169,9 +165,9 @@ Genome-disjoint evaluation assigns all observations from the same genome to one 
 
 Query genomes are therefore absent from the target-support set. This protocol tests transfer to unseen target genomes.
 
-### Leave-One-Antibiotic-Out (LOAO) Evaluation
+### LOAO Evaluation
 
-Leave-one-antibiotic-out evaluation uses all observations for one target antibiotic as the query set.
+LOAO evaluation uses all observations for one target antibiotic as the query set.
 
 All remaining target antibiotics form the support pool. This protocol tests transfer when the query antibiotic has no target-species MIC labels in the support data.
 
@@ -185,10 +181,10 @@ LOAO evaluation additionally includes a **target-only full-support reference** t
 
 ## Source-Shared and Source-Unseen Antibiotics
 
-Results are also stratified according to whether the target antibiotic was represented in source MIC supervision.
+Results are also stratified according to whether the target antibiotic is represented in source MIC data.
 
-- **Source-shared:** MIC supervision for the antibiotic is available in at least one source species.
-- **Source-unseen:** the antibiotic is absent from source MIC supervision.
+- **Source-shared:** MIC data for the antibiotic are available in at least one source species.
+- **Source-unseen:** the antibiotic is absent from source MIC data.
 
 The six antibiotics shared across all three species form an additional matched comparison panel.
 
@@ -221,7 +217,7 @@ We also report:
 | --- | --- |
 | Zero-target-label full target panel | Mean ± sample SD across three model seeds |
 | Random-pair and genome-disjoint | Metrics are first averaged across seeds within each fold, then summarized across five folds |
-| Leave-one-antibiotic-out | Metrics are first averaged across seeds for each query antibiotic, then summarized across held-out antibiotics |
+| LOAO | Metrics are first averaged across seeds for each query antibiotic, then summarized across held-out antibiotics |
 
 Paper-facing aggregate results are available in:
 
@@ -308,7 +304,7 @@ python scripts/adapt_genome_disjoint.py --device cuda
 python scripts/aggregate_genome_disjoint.py
 ```
 
-### Leave-One-Antibiotic-Out Adaptation
+### LOAO Adaptation
 
 ```bash
 python scripts/adapt_antibiotic_held_out.py --device cuda
