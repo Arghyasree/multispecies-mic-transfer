@@ -95,7 +95,7 @@ The model-selection procedure compared the following candidate families.
 | --- | --- |
 | Genome representation | canonical 4–8-mer composition; common AMR determinants; input-level k-mer+AMR concatenation; projected and low-rank separate-encoder fusion |
 | Antibiotic representation | RDKit descriptors; Morgan fingerprints; ChemBERTa embeddings; input-level and separate-encoder multi-view combinations |
-| Genome–antibiotic architecture | additive effects; projection–concatenation MLP; dual-tower interaction; GMU; low-rank bilinear interaction; drug-to-genome FiLM |
+| Genome–antibiotic architecture | additive effects; projection–concatenation multilayer perceptron (MLP); dual-tower interaction; gated multimodal unit (GMU); low-rank bilinear interaction; drug-to-genome feature-wise linear modulation (FiLM) |
 
 The model-selection stages are described in [`docs/model_selection.md`](docs/model_selection.md).
 
@@ -143,9 +143,11 @@ In **zero-target-label transfer**, the model is trained only on source-species o
 
 For each query, non-query observations are arranged deterministically interleaved across support antibiotics.
 
+The 1%, 5%, and 10% target-support sets are nested prefixes of this ordering, with sizes obtained by rounding the corresponding fraction of the support pool and enlarged, where possible, to include every available support antibiotic.
+
 For each support antibiotic with at least two observations, a deterministic 20% subset is used for inner validation while keeping at least one observation for training.
 
-Per-antibiotic macro-RMSE is used to select the adaptation duration, with up to 100 epochs and patience 12. The source checkpoint is then reloaded and adapted on the complete support set for the selected duration.
+Per-antibiotic macro-averaged root mean squared error (macro-RMSE) is used to select the adaptation duration, with up to 100 epochs and patience 12. The source checkpoint is then reloaded and adapted on the complete support set for the selected duration.
 
 Target-query labels are never used for adaptation-epoch selection.
 
@@ -207,7 +209,7 @@ The primary metric is **per-antibiotic macro-RMSE** on the log₂ MIC scale.
 
 We also report:
 
-- macro-MAE;
+- macro-averaged mean absolute error (macro-MAE);
 - R²;
 - Pearson correlation;
 - Spearman correlation;
