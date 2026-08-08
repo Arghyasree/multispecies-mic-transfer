@@ -60,7 +60,7 @@ For each outer target, the other two species are used as development species:
 
 Candidate genome representations, antibiotic representations, architectures, and hyperparameters are compared through bidirectional transfer between the two development species.
 
-The main model-selection metric is per-antibiotic macro-RMSE.
+The main model-selection metric is per-antibiotic macro-averaged root mean squared error (macro-RMSE).
 
 More details are provided in:
 
@@ -89,8 +89,6 @@ In zero-target-label transfer, the model is trained using source-species observa
 
 No MIC labels from the target species are used for training.
 
-This corresponds to the zero-shot transfer setting used in the manuscript.
-
 ### Limited-Label Transfer
 
 Limited-label transfer starts from the source-trained model and adapts it using nested:
@@ -100,6 +98,8 @@ Limited-label transfer starts from the source-trained model and adapts it using 
 - 10% target support.
 
 The target-support sets contain only non-query observations.
+
+For each query, non-query observations are arranged deterministically interleaved across support antibiotics. The 1%, 5%, and 10% target-support sets are nested prefixes of this ordering, with sizes obtained by rounding the corresponding fraction of the support pool and enlarged, where possible, to include every available support antibiotic.
 
 Target-query labels are not used for adaptation-epoch selection.
 
@@ -119,9 +119,9 @@ Genome-disjoint evaluation keeps all observations from the same genome in one fo
 
 Genomes with identical canonical 8-mer profiles are also kept together.
 
-Query genomes are absent from target support.
+Query genomes are absent from the target-support set. This protocol tests transfer to unseen target genomes.
 
-### Leave-One-Antibiotic-Out (LOAO) Evaluation
+### LOAO Evaluation
 
 LOAO evaluation uses all observations for one target antibiotic as the query set.
 
@@ -139,10 +139,10 @@ LOAO evaluation also includes a **target-only full-support reference** trained o
 
 ## Source-Shared and Source-Unseen Antibiotics
 
-Target antibiotics are also grouped according to their source MIC supervision.
+Target antibiotics are also grouped according to their source MIC data.
 
-- **Source-shared:** MIC supervision for the target antibiotic is available in at least one source species.
-- **Source-unseen:** the target antibiotic is absent from source MIC supervision.
+- **Source-shared:** MIC data for the target antibiotic are available in at least one source species.
+- **Source-unseen:** the target antibiotic is absent from source MIC data.
 
 The six antibiotics shared across Ec, Kp, and Se form an additional matched comparison panel.
 
