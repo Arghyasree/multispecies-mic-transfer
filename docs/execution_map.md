@@ -2,7 +2,7 @@
 
 This document shows how the main stages of the study correspond to the scripts and files in this repository.
 
-The numbered scripts preserve the study's development and audit trail. The script numbers are not continuous because some historical or internal steps are not included in the public repository.
+The numbered scripts preserve the study's development record. The script numbers are not continuous because some historical or internal steps are not included in the public repository.
 
 The named training and adaptation scripts are the main entry points for rerunning the final evaluation.
 
@@ -125,17 +125,17 @@ It requires resources that are not stored in the repository, including:
 - Kleborate;
 - AMRFinderPlus;
 - external molecular resources;
-- historical intermediate assets that are not distributed.
+- historical intermediate files that are not distributed.
 
-The numbered scripts preserve the released audit trail, but they should not be interpreted as one uninterrupted raw-data-to-results command chain.
+The numbered scripts preserve the released workflow record, but they should not be interpreted as one uninterrupted raw-data-to-results command chain.
 
-Some historical scripts use intermediate manifests or candidate feature assets whose generating steps are not part of the public release.
+Some historical scripts use intermediate manifests or candidate feature files whose generating steps are not part of the public release.
 
-## Historical Audit Fields
+## Historical Metadata Fields
 
 Scripts `174` and `175` retain common-six fields from an earlier preregistration stage.
 
-These fields are kept as historical audit metadata. They are not the final evaluation panel.
+These fields are retained as historical metadata. They are not part of the final evaluation panel.
 
 The paper-facing evaluation reports:
 
