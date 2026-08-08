@@ -67,7 +67,7 @@ The evaluation covers:
 - balanced multisource training;
 - random-pair limited-label adaptation;
 - genome-disjoint limited-label adaptation;
-- leave-one-antibiotic-out (LOAO) limited-label adaptation;
+- LOAO limited-label adaptation;
 - target-only scratch baselines;
 - the target-only full-support reference used for LOAO;
 - source-shared and source-unseen antibiotic analysis.
@@ -125,9 +125,9 @@ Genome-disjoint evaluation keeps all observations from the same genome in one fo
 
 Genomes with identical canonical 8-mer profiles are also kept together.
 
-Query genomes are therefore absent from the target-support set.
+Query genomes are therefore absent from the target-support set. This protocol tests transfer to unseen target genomes.
 
-### Step 5: Leave-One-Antibiotic-Out Adaptation
+### Step 5: LOAO Adaptation
 
 Run:
 
@@ -136,13 +136,13 @@ python scripts/adapt_antibiotic_held_out.py --device cuda
 python scripts/aggregate_antibiotic_held_out.py
 ```
 
-In leave-one-antibiotic-out (LOAO) evaluation, all observations for one target antibiotic form the query set.
+In LOAO evaluation, all observations for one target antibiotic form the query set.
 
 All remaining target antibiotics form the support pool.
 
 The query antibiotic therefore has no target-species MIC labels in the support data.
 
-### Target-Support Budgets
+### Target-Support Settings
 
 Limited-label transfer uses nested:
 
@@ -150,7 +150,7 @@ Limited-label transfer uses nested:
 - 5% target support;
 - 10% target support.
 
-The support sets are constructed from non-query target observations.
+For each query, non-query observations are arranged deterministically interleaved across support antibiotics. The 1%, 5%, and 10% target-support sets are nested prefixes of this ordering, with sizes obtained by rounding the corresponding fraction of the support pool and enlarged, where possible, to include every available support antibiotic.
 
 Target-query labels are used only for final evaluation and are not used for adaptation-epoch selection.
 
@@ -190,14 +190,14 @@ Because BV-BRC is a live public resource, records downloaded at a later date may
 
 For this reason, the released benchmark, feature matrices, split definitions, model configurations, and aggregate results should be used when reproducing the reported final evaluation.
 
-## Public Audit Trail
+## Public Workflow Record
 
-The numbered scripts preserve the main public audit trail for:
+The numbered scripts preserve the main public workflow for:
 
 - BV-BRC record acquisition;
 - quantitative MIC filtering and harmonization;
 - genome quality control;
-- repeated-record reconciliation;
+- resolution of repeated measurements;
 - antibiotic eligibility;
 - genome acquisition;
 - sequence-based species verification;
@@ -215,7 +215,7 @@ For the script-to-stage mapping, see:
 
 `docs/execution_map.md`
 
-## Molecular Feature Provenance
+## Molecular Feature Generation Information
 
 The final antibiotic feature matrices are stored under:
 
@@ -249,7 +249,7 @@ https://github.com/klebgenomics/Kleborate
 
 ### AMRFinderPlus
 
-AMRFinderPlus is used for antimicrobial resistance determinant annotation.
+AMRFinderPlus is used for antimicrobial resistance (AMR) determinant annotation.
 
 Project documentation:
 
@@ -278,7 +278,7 @@ Some historical model-selection scripts retain older machine-specific fallback p
 
 When running those historical scripts, setting `MIC_TRANSFER_PROJECT` avoids relying on those fallback paths.
 
-These historical paths are retained so that the released model-selection scripts remain consistent with the study audit trail.
+These historical paths are retained so that the released model-selection scripts remain consistent with the study development record.
 
 Gzip-compressed TSV files are read directly by pandas and do not need to be extracted first.
 
