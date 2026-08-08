@@ -19,7 +19,7 @@ The compressed TSV contains one row for each unique species–genome–antibioti
 
 The benchmark was constructed from **179,385 source records** in the BV-BRC snapshot retrieved on **22 July 2026**.
 
-Compatible repeated records for the same genome–antibiotic pair were reconciled into one observation. The released benchmark contains **11,005 observations** built from more than one source record. At most three source records contribute to a single released observation.
+Compatible repeated records for the same genome–antibiotic pair were resolved into one observation. The released benchmark contains **11,005 observations** built from more than one source record. At most three source records contribute to a single released observation.
 
 ## Reading the Benchmark
 
@@ -54,36 +54,36 @@ These columns identify each benchmark observation and its quantitative MIC targe
 | `final_transfer_observation_row` | integer | Zero-based row index in the final transfer benchmark. |
 | `species_code` | string | Machine-readable species code: `ec`, `kp`, or `se`. |
 | `provisional_species` | string | Harmonized species assignment used during benchmark construction. |
-| `observation_id` | string | Stable identifier for the reconciled quantitative MIC observation. |
+| `observation_id` | string | Stable identifier for the final quantitative MIC observation. |
 | `genome_id` | string | BV-BRC genome identifier. |
 | `normalized_antibiotic` | string | Harmonized antibiotic name used throughout the study. |
 | `mic_target_log2_mg_per_l` | float | Regression target: base-2 logarithm of the point MIC in mg/L. |
-| `is_exact_observation` | Boolean | `True` when the reconciled MIC observation is exact. |
+| `is_exact_observation` | Boolean | `True` when the final MIC observation is exact. |
 | `is_censored_observation` | Boolean | `True` when the observation is left- or right-censored. |
 
 Every observation is either exact or censored, but never both.
 
 Each species–genome–antibiotic combination appears only once in the released benchmark.
 
-## Reconciled MIC Constraint Fields
+## MIC Constraint Fields
 
 These columns describe how the original MIC measurement, or compatible repeated measurements, were converted into the final quantitative observation.
 
 | Column | Type | Description |
 | --- | --- | --- |
-| `reconciliation_status` | string | Result of handling a single record or reconciling repeated records. |
-| `constraint_origin` | string | Provenance category of the final MIC constraint. |
+| `reconciliation_status` | string | Result of handling a single record or resolving repeated records. |
+| `constraint_origin` | string | Source category of the final MIC constraint. |
 | `duplicate_class` | string | Class describing the source-record multiplicity or duplication pattern. |
-| `reduced_constraint_type` | string | Final MIC constraint type after reconciliation. |
+| `reduced_constraint_type` | string | Final MIC constraint type after resolving repeated measurements. |
 | `reduced_sign` | string | Final relation sign: `=`, `<`, `<=`, `>`, or `>=`. |
 | `reduced_mic_value` | float | MIC threshold associated with the final relation sign. |
-| `intersection_lower` | optional float | Lower endpoint of the reconciled MIC interval. Blank when there is no lower bound. |
+| `intersection_lower` | optional float | Lower endpoint of the final MIC interval. Blank when there is no lower bound. |
 | `intersection_lower_closed` | optional Boolean | Indicates whether the lower interval endpoint is inclusive. |
-| `intersection_upper` | optional float | Upper endpoint of the reconciled MIC interval. Blank when there is no upper bound. |
+| `intersection_upper` | optional float | Upper endpoint of the final MIC interval. Blank when there is no upper bound. |
 | `intersection_upper_closed` | optional Boolean | Indicates whether the upper interval endpoint is inclusive. |
-| `intersection_notation` | string | Human-readable form of the reconciled MIC interval. |
+| `intersection_notation` | string | Human-readable form of the final MIC interval. |
 | `mic_target_point_mg_per_l` | float | Positive point MIC used as the regression target, in mg/L. |
-| `mic_target_substitution_rule` | string | Rule used to convert the reconciled constraint into a point MIC target. |
+| `mic_target_substitution_rule` | string | Rule used to convert the final constraint into a point MIC target. |
 | `censoring_direction` | string | Censoring direction: none, left, or right. |
 | `censoring_strictness` | string | Indicates whether the censoring relation is strict or inclusive. |
 | `point_target_version` | string | Version identifier for the point-target construction rule. |
@@ -98,9 +98,9 @@ For strict censored measurements:
 - `<c` is represented by `c/2`;
 - `>c` is represented by `2c`.
 
-The original relation sign and reconciled interval remain in the benchmark, so the censoring information is retained.
+The original relation sign and final interval remain in the benchmark, so the censoring information is retained.
 
-## Source-Record Provenance Fields
+## Source-Record Information Fields
 
 These columns preserve information about the original BV-BRC records that contributed to each released observation.
 
@@ -125,7 +125,7 @@ These columns preserve information about the original BV-BRC records that contri
 | `source_pmids` | string | Publication identifiers reported by BV-BRC. |
 | `source_insertion_dates` | string | BV-BRC insertion dates for the contributing records. |
 | `source_context_count` | integer | Number of retained source contexts for the released observation. |
-| `source_contexts` | string | Serialized source-context information retained during reconciliation. |
+| `source_contexts` | string | Serialized source-context information retained while resolving repeated records. |
 | `source_measurement_units` | string | Original MIC units, positionally aligned with `source_record_ids`. |
 | `source_resistant_phenotypes` | string | Resistant-phenotype values, positionally aligned with `source_record_ids`. |
 | `source_modification_dates` | string | BV-BRC modification dates, positionally aligned with `source_record_ids`. |
@@ -137,7 +137,7 @@ Empty pipe-delimited entries are kept when an individual source record does not 
 
 Every released source record has `Laboratory Method` evidence.
 
-The complete raw BV-BRC snapshot and genome assemblies are not copied into this repository. The released benchmark is a derived and reconciled table that keeps the provenance needed to identify its contributing BV-BRC source records.
+The complete raw BV-BRC snapshot and genome assemblies are not copied into this repository. The released benchmark is a derived table that retains the source-record information needed to identify its contributing BV-BRC records.
 
 ## Feature-Alignment Fields
 
