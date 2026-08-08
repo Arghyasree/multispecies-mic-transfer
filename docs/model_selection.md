@@ -1,4 +1,4 @@
-# Target-Excluded Nested LOSO Model Selection
+# Target-Excluded Nested Leave-One-Species-Out (LOSO) Model Selection
 
 This document explains how the model configuration was selected for each held-out target species.
 
@@ -28,15 +28,15 @@ The model-development procedure is staged rather than one large simultaneous sea
 
 The stages are:
 
-1. canonical k-mer length screening;
-2. genome-representation screening;
-3. numerical hyperparameter and low-rank genome-fusion screening;
+1. canonical k-mer length evaluation;
+2. genome-representation comparison;
+3. numerical hyperparameter and low-rank genome-fusion comparison;
 4. confirmation of the leading genome representations;
-5. antibiotic-representation screening;
-6. cross-modal genome–antibiotic architecture screening;
+5. antibiotic-representation comparison;
+6. cross-modal genome–antibiotic architecture comparison;
 7. final target-excluded configuration confirmation.
 
-Each stage uses the selected result from the earlier stage before moving to the next comparison.
+Each stage uses the selected result from the preceding stage before moving to the next comparison.
 
 This keeps the search manageable while preserving the target-excluded nested LOSO design.
 
@@ -69,17 +69,17 @@ The antibiotic-identity control is also evaluated during model development, but 
 The cross-modal architecture comparison includes the candidate genome–antibiotic interaction models used in the study, including:
 
 - additive genome–antibiotic effects;
-- projection–concatenation MLP;
+- projection–concatenation multilayer perceptron (MLP);
 - dual-tower interaction;
 - gated multimodal unit (GMU);
 - low-rank bilinear interaction;
-- drug-to-genome FiLM.
+- drug-to-genome feature-wise linear modulation (FiLM).
 
 ## How Candidates Are Compared
 
 For each outer target loop, candidate configurations are evaluated in both transfer directions between the two development species.
 
-The main model-selection metric is **per-antibiotic macro-RMSE**.
+The main model-selection metric is **per-antibiotic macro-averaged root mean squared error (macro-RMSE)**.
 
 The bidirectional development results are used to rank candidate representations, fusion choices, architectures, and hyperparameters.
 
