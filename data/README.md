@@ -24,7 +24,7 @@ The table includes:
 - the quantitative MIC regression target;
 - the original exact or censored MIC information;
 - the final MIC interval after resolving repeated measurements;
-- provenance for the contributing BV-BRC source records;
+- source-record information for the contributing BV-BRC records;
 - genome and antibiotic feature-row indices;
 - random-pair fold assignments;
 - genome-disjoint fold assignments.
