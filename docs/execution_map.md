@@ -6,14 +6,16 @@ The numbered scripts preserve the study's development and audit trail. The scrip
 
 The named training and adaptation scripts are the main entry points for rerunning the final evaluation.
 
+Leave-one-species-out (LOSO) refers to the target-excluded configuration-selection design used in the study.
+
 ## Study Stages and Scripts
 
 | Stage | Released scripts | Main inputs | Main outputs |
 | --- | --- | --- | --- |
 | BV-BRC laboratory-record acquisition and profiling | `01`, `02`, `03` | BV-BRC `genome_amr` records | laboratory-method records, quantitative MIC profiles, and provisional species–antibiotic coverage summaries |
 | Genome metadata and assembly quality control | `06`, `07`, `08` | MIC-linked candidate genomes and BV-BRC genome metadata | taxonomy checks, assembly-quality summaries, and retained-genome manifests |
-| Quantitative MIC, source, mapping, and identity curation | `13`, `14`, `15`, `16`, `20`, `22`, `25`, `26` | quality-controlled laboratory AMR records | scalar single-antibiotic MIC records, repeated-record checks, and reconciled quantitative MIC observations |
-| Coverage-based antibiotic eligibility | `28` | reconciled species–genome–antibiotic observations | species–antibiotic coverage definitions |
+| Quantitative MIC, source, mapping, and identity curation | `13`, `14`, `15`, `16`, `20`, `22`, `25`, `26` | quality-controlled laboratory antimicrobial resistance (AMR) records | scalar single-antibiotic MIC records, repeated-record checks, and unique quantitative MIC observations after resolving repeated measurements |
+| Coverage-based antibiotic eligibility | `28` | unique species–genome–antibiotic observations after resolving repeated measurements | species–antibiotic coverage definitions |
 | Molecular eligibility and genome acquisition | `45`, `46` | coverage-eligible MIC observations and antibiotic structure registry | modelling cohort and genome-acquisition manifest |
 | Sequence-based taxonomy preparation and verification | `49`, `50`, `51`, `52` | candidate genome assemblies and reference resources | sequence-based species assignments and retained-genome registries |
 | Taxonomy-verified modelling precursor | `63` | molecularly eligible observations and retained-genome registries | taxonomy-filtered modelling cohorts used to construct the final benchmark |
@@ -39,7 +41,7 @@ These stages include:
 
 - quantitative MIC filtering and harmonization;
 - genome assembly quality control;
-- repeated-record reconciliation;
+- resolution of repeated measurements;
 - species–antibiotic coverage requirements;
 - antibiotic molecular-structure eligibility;
 - genome acquisition;
@@ -206,5 +208,5 @@ For more detail, see:
 - `README.md`
 - `docs/model_selection.md`
 - `docs/public_pipeline.md`
-- `docs.md`
+- `docs/reproducibility.md`
 - `docs/benchmark_schema.md`
