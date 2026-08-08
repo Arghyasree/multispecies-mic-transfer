@@ -38,9 +38,9 @@ The benchmark was constructed from the public [BV-BRC](https://www.bv-brc.org/) 
 
 | Species | Genomes | MIC observations | Exact | Censored | Antibiotics |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| *Ec* | 6,673 | 68,881 | 25,742 | 43,139 | 19 |
-| *Kp* | 5,602 | 50,299 | 13,582 | 36,717 | 17 |
-| *Se* | 9,119 | 49,183 | 20,644 | 28,539 | 8 |
+| Ec | 6,673 | 68,881 | 25,742 | 43,139 | 19 |
+| Kp | 5,602 | 50,299 | 13,582 | 36,717 | 17 |
+| Se | 9,119 | 49,183 | 20,644 | 28,539 | 8 |
 | **Total** | **21,394** | **168,363** | **59,968** | **108,395** | **19 unique** |
 
 The benchmark contains **168,363 unique genome–antibiotic observations** from **21,394 quality-controlled and sequence-verified genomes** across a **19-antibiotic cross-species vocabulary**.
